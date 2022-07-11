@@ -1,0 +1,12 @@
+
+    model {
+        d ~ dnorm(1, 1)             
+        b ~ dnorm(0, 1)
+        
+        phih <- phi( d / 2 - b)     
+        phif <- phi(-d / 2 - b)
+        
+        h ~ dbin(phih, sigtrials)  
+        f ~ dbin(phif, noistrials)
+     }
+

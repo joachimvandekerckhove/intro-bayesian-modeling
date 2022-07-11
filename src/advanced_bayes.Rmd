@@ -1,0 +1,75 @@
+---
+title: "Exercises in Bayesian reasoning: Proceedings of the Ministry of Magic"
+author: "Joachim Vandekerckhove"
+output:
+  beamer_presentation
+knit: (function(inputFile, encoding) {
+    rmarkdown::render(inputFile, encoding = encoding, output_dir = "../pdf")
+  })
+---
+
+## The happy herbologist
+\pause
+At Hogwarts School of Witchcraft and Wizardry, professor Pomona Sprout leads the Herbology Department. In one project, she is developing a spell to evaluate the quality of a magical plant called \emph{green codacle}---a leaf that when consumed causes a witch or wizard to feel euphoric and relaxed. However, a mutation affecting \color{red}one in a thousand \color{black}codacle plants changes its effects, and those rare plants cause paranoia and anxiety.\pause
+
+Professor Sprout's new spell can accurately detect an existing mutation \color{red}99\% \color{black} of the time, but will also falsely indicate that a healthy plant is a mutant \color{red}2\% \color{black} of the time.  \pause
+
+When Sprout presents her results at a School colloquium, Professor of Divination Sybill Trelawney asks two questions: \pause
+
+- What is the probability that a codacle plant is a mutant, when your spell says that it is? 
+- And what is the probability the plant is a mutant, when your spell says that it is healthy? 
+
+## The happy herbologist
+Call the event that a specific plant is a mutant ${\cal M}$, and that it is healthy $\neg {\cal M}$. 
+
+Call the event that professor Sprout's spell diagnoses a plant as a mutant $D$, and that it diagnoses it healthy $\neg D$. 
+
+Professor Trelawney's interest is in the probability the plant is indeed a mutant given it has been diagnosed as a mutant, or $P({\cal M}|D)$, and the probability the plant is a mutant given it has been diagnosed healthy, or $P({\cal M}|\neg D)$. 
+
+## The happy herbologist
+Professor Trelawney, who is an accomplished statistician, has all the relevant information to apply Bayes' Rule to find these probabilities:
+
+- She knows the prior probability that a plant is a mutant is $P({\cal M}) = .001$, and thus the prior probability that a plant is not a mutant is $P(\neg {\cal M}) = 1 - P({\cal M}) = .999$. 
+- The probability of a correct mutant diagnosis given the plant is a mutant is $P(D|{\cal M}) = .99$, and the probability of an erroneous healthy diagnosis given the plant is a mutant is thus $P(\neg D|{\cal M}) = 1 - P(D|{\cal M}) = .01$. 
+- When the plant is healthy, the spell incorrectly diagnoses it as a mutant with probability $P(D|\neg {\cal M}) = .02$, and correctly diagnoses the plant as healthy with probability $P(\neg D|\neg {\cal M}) = 1 - P(D|\neg {\cal M}) = .98$.
+
+## The happy herbologist
+When Professor Sprout's spell gives a mutant diagnosis, the posterior probability that the plant is really a mutant is given by:
+$$
+P({\cal M}|D) = \frac{P({\cal M})P(D|{\cal M})}{P({\cal M})P(D|{\cal M}) + P(\neg {\cal M})P(D|\neg {\cal M})}.
+$$
+Professor Trelawney can now plug in the values to find that the posterior probability the plant is a mutant given a mutant diagnosis is:
+$$
+P({\cal M}|D) = \frac{.001 \times .99}{.001 \times .99 + .999\times .02} \approx .047.
+$$
+
+## The happy herbologist
+
+A mutant diagnosis from Professor Sprout's spell raises the probability the plant is a mutant from $.001$ to roughly $.047$. This means that when a plant is diagnosed as a mutant, the posterior probability the plant is \textit{not} a mutant is $P(\neg {\cal M}|D) = 1 - .047 \approx .953$. \pause
+
+The low prior probability that a plant is a mutant means that, even with the spell having 99\% accuracy to correctly diagnose a mutant plant as such, a plant diagnosed as a mutant is still probably safe to eat -- but Professor Trelawney might now think twice.
+
+## The happy herbologist
+Analogous calculations show that the posterior probability that a plant is a dangerous mutant, given it is diagnosed as healthy, is:
+$$
+P({\cal M}|\neg D) = \frac{.001 \times .01}{.001 \times .01 + .999\times .98} \approx .000010.
+$$\pause
+The posterior probability that a plant is a dangerous mutant despite being diagnosed as healthy is almost vanishingly small, so Professor Trelawney can be relatively confident she is eating a healthy plant after professor Sprout's spell returns a healthy diagnosis.
+
+## The happy herbologist
+An advantage of using Bayes' Rule in this way is that it gracefully extends to more complex scenarios.\pause
+
+Consider the perhaps disappointing value of $P({\cal M}|D)$: a mutant diagnosis only brings the posterior probability up to 5\%.  Suppose, however, that Professor Sprout knows that her diagnosis is statistically independent from the diagnosis of her research associate Neville Longbottom, and suppose that both Sprout and Longbottom return the mutant diagnosis. Due to the independence of the diagnoses, we know that
+\begin{eqnarray*}
+P(D_S, D_L |     {\cal M}) &=& P(D_S |     {\cal M}) \times P(D_L |     {\cal M}) = .99 \times .99 = .9801\\
+P(D_S, D_L | \neg{\cal M}) &=& P(D_S | \neg{\cal M}) \times P(D_L | \neg{\cal M}) = .02 \times .02 = .0004
+\end{eqnarray*}
+
+## The happy herbologist
+
+Applying Bayes' Rule once more (and considering that the joint event $(D_S, D_L)$ can be treated like any other event), the posterior probability that the plant is really a mutant is now given by:
+\begin{eqnarray*}
+P({\cal M}|D_S, D_L) &=& \frac{P({\cal M})P(D_S, D_L|{\cal M})}{P({\cal M})P(D_S, D_L|{\cal M}) + P(\neg {\cal M})P(D_S, D_L|\neg {\cal M})} \\
+               &=& \frac{.001 \times .99 \times .99}{.001 \times .99 \times .99 + .999\times .02 \times .02} \approx .71,
+\end{eqnarray*}
+which illustrates the value of multiple independent sources of evidence: a plant that has been independently diagnosed as a mutant is quite likely to be one. A third independent diagnosis would put the posterior probability over 99\%.

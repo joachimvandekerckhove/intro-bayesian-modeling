@@ -1,0 +1,326 @@
+---
+title: "The Lady Tasting Wine"
+author: "Joachim Vandekerckhove"
+output:
+  beamer_presentation:
+    incremental: yes
+knit: (function(inputFile, encoding) {
+    rmarkdown::render(inputFile, encoding = encoding, output_dir = "../pdf")
+  })
+---
+
+## The Lady Tasting Wine
+
+The second lady is a Master of Wine
+
+- Claims to be able to discriminate between French Bordeaux wine and a Californian Cabernet Sauvignon, Merlot blend
+- She is put to a similar test
+
+## The Lady Tasting Wine (RRRRRW)
+- The same data
+    - RRRRRW, so the likelihood is again $P_R^5 (1 - P_R) \times C$
+- But different prior notions
+    - One might believe that Masters of Wine can distinguish the Californian imitation from the French original, so that $P_R \geq 0.5$
+    - ... while at the same time doubting that ladies can distinguish the two methods of teamaking, so that $P_R = 0.5$ is most likely (but $P_R > 0.5$ is possible)
+- It is possible for you to disagree and still be sensible
+
+## The Lady Tasting Wine (RRRRRW)
+- Tea is different from wine
+    - This is relevant and useful prior information
+    - We can assume one prior for the case of wine
+        - $p(P_R) = K_w (1.01 - P_R)(P_R - 0.49)$, for $0.5 \leq P_R \leq 1$
+    - ... and another for the case of tea: 
+        - $p(P_R) = 0.8$ for $P_R = 0.5$
+        - $p(P_R) = K_t (1 - P_R)$ for $P_R > 0.5$
+- $K_t$ and $K_w$ are chosen such that the sum (or integral) over all possibilities is 1. This is always possible if the distribution is proper. The solution for wine here is easy enough (it is the sum of $(1 - P_R)(P_R - 0.5)$ for all values of $P_R$), but it isn’t in general
+
+## The Lady Tasting Wine (RRRRRW)
+- Exercise: Compute and plot these in R
+    - Compute these priors for every value of $P_R$ and plot them side-by-side
+        - Use $P_R \in \{0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85,0.90,0.95, 1.0\}$
+    - Wine: $p(P_R) = K_w (1.01 - P_R)(P_R - 0.49)$, for $0.5 \leq P_R \leq 1$
+    - Tea: $p(P_R) = 0.8$ for $P_R = 0.5$ and $p(P_R) = K_t (1 - P_R)$ for $P_R > 0.5$
+- $K_*$ is the sum of everything else over values of $P_R$
+
+## The Lady Tasting Wine (RRRRRW)
+```{r fig.width = 5, fig.height = 4, fig.align='center', echo=FALSE, trap1}
+rm(list=ls())  # clear the workspace
+
+domain <- seq(0.5, 1.0, .05)         # make the domain
+prior.usc <- 1 - domain[2:11]        # this is the prior for all values except the first
+k <- 1/sum(prior.usc)                # k is the scaling constant that will make sure that the prior
+prior <- c(.8, 0.2 * prior.usc * k)  #     adds up to 1.0 (but keep in mind that 80% of that is on 0.5)
+
+# And make the bar plot:
+barplot(prior, main="tea", 
+        #xlab="parameter", ylab="density",
+        names.arg=domain, ylim = c(0,1),
+        border=rgb(.8,.9,0), col=rgb(.8,.9,0))
+```
+
+## The Lady Tasting Wine (RRRRRW)
+```{r fig.width = 5, fig.height = 4, fig.align='center', echo=FALSE, trap2}
+rm(list=ls())  # clear the workspace
+
+domain <- seq(0.5, 1.0, .05)                    # make the domain
+prior.usc <- (1.01 - domain) * (domain - 0.49)  # this is the prior for all values
+k <- 1/sum(prior.usc)                           # k is the scaling constant that will make sure that the prior
+prior <- prior.usc * k                          #     adds up to 1.0
+
+# And make the bar plot:
+barplot(prior, main="wine", 
+        #xlab="parameter", ylab="density",
+        names.arg=domain, ylim = c(0,1),
+        border=rgb(.7,0,0), col=rgb(.7,0,0))
+```
+
+## The Lady Tasting Wine (RRRRRW)
+Shaping ones posterior: $p(\theta|x) = K p(\theta)p(x|\theta)$
+
+- Wine: $p(P_R | {\color{blue}\#R}, {\color{blue}\#W}, {\color{red}wine}) = S_w \times {\color{red}K_w (1.01 - P_R)(P_R - 0.49)} \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}}$
+- Tea: 
+    - $p(P_R |{\color{blue}\#R}, {\color{blue}\#W}, {\color{green}tea}) = S_t \times {\color{green}0.8} \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}}$ if $P_R = 0.5$
+    - $p(P_R |{\color{blue}\#R}, {\color{blue}\#W}, {\color{green}tea}) = S_t \times {\color{green}K_t (1 - P_R)} \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}}$
+if $P_R > .05$
+
+## The Lady Tasting Wine (RRRRRW)
+Excercise: plot these in R, using ${\color{blue}\#R=5}$, ${\color{blue}\#W=1}$
+
+- Wine: $p(P_R | {\color{blue}\#R}, {\color{blue}\#W}, {\color{red}wine}) = S_w \times {\color{red}K_w (1.01 - P_R)(P_R - 0.49)} \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}}$
+- Tea: 
+    - $p(P_R |{\color{blue}\#R}, {\color{blue}\#W}, {\color{green}tea}) = S_t \times {\color{green}0.8} \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}}$ if $P_R = 0.5$
+    - $p(P_R |{\color{blue}\#R}, {\color{blue}\#W}, {\color{green}tea}) = S_t \times {\color{green}K_t (1 - P_R)} \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}}$
+if $P_R > .05$
+- Also, make them pretty.
+
+
+## The Lady Tasting Wine (RRRRRW)
+```{r fig.width = 5, fig.height = 4, fig.align='center', echo=FALSE, trap4}
+rm(list=ls())  # clear the workspace
+
+# Enter the data:
+W <- 1
+R <- 5
+
+domain <- seq(0.5, 1.0, .05)
+prior.usc <- (1.01 - domain) * (domain - 0.49)
+k <- 1/sum(prior.usc)
+prior <- prior.usc * k
+
+likelihood.usc <- (1-domain)^W * domain^R  # this is the unscaled likelihood (a.k.a. the kernel)
+
+post.usc <- prior * likelihood.usc   # bam
+
+stc <- 1/sum(post.usc)   # the scaling constant S_t*C
+post <- post.usc * stc   #     scales the posterior
+
+# and plot:
+barplot(prior, main="wine", 
+        #xlab="parameter", ylab="density",
+        names.arg=domain, ylim = c(0,1),
+        border=rgb(.7,0,0), col=rgb(.7,0,0))
+barplot(post, main="wine",
+        #xlab="parameter", ylab="density",
+        width = .3, space = 3, ylim = c(0,1),
+        border=rgb(1,.5,.5), col=rgb(1,.5,.5), add = TRUE)
+legend(legend=c('prior','posterior'),
+       pch=15,x='top',col=c(rgb(.7,0,0),rgb(1,.5,.5)))
+
+```
+
+## The Lady Tasting Wine (RRRRRW)
+```{r fig.width = 5, fig.height = 4, fig.align='center', echo=FALSE, trap5}
+rm(list=ls())
+W <- 1
+R <- 5
+
+x <- seq(0.5, 1.0, .05)
+prior.usc <- 1 - x[2:11]
+k <- 1/sum(prior.usc)
+
+prior <- c(.8, 0.2 * prior.usc * k)
+
+likelihood.usc <- (1-x)^W * x^R
+
+post.usc <- prior * likelihood.usc
+
+stc <- 1/sum(post.usc)
+post <- post.usc * stc
+
+barplot(prior, main="tea", 
+        #xlab="parameter", ylab="density", 
+        names.arg=x, ylim = c(0,1),
+        border=rgb(.8,.9,0), col=rgb(.8,.9,0))
+barplot(post, main="tea",
+        #xlab="parameter", ylab="density", 
+        width = .3, space = 3, ylim = c(0,1),
+        border=rgb(0,.2,0), col=rgb(0,.2,0), add = TRUE)
+legend(legend=c('prior','posterior'),
+       pch=15,x='top',col=c(rgb(.8,.9,0),rgb(0,.2,0)))
+
+```
+
+## The Lady Tasting Wine (RRRRRW)
+```{r fig.width = 5, fig.height = 4, fig.align='center', echo=FALSE, trap3}
+rm(list=ls())
+W <- 1
+R <- 5
+
+x <- seq(0.5, 1.0, .05)
+prior.usc <- 1 - x[2:11]
+k <- 1/sum(prior.usc)
+
+prior <- c(.8, 0.2 * prior.usc * k)
+
+likelihood.usc <- (1-x)^W * x^R
+
+post.usc <- prior * likelihood.usc
+
+stc <- 1/sum(post.usc)
+post <- post.usc * stc
+
+barplot(prior, main="tea", 
+        #xlab="parameter", ylab="density", 
+        names.arg=x, ylim = c(0,1),
+        border=rgb(.8,.9,0), col=rgb(.8,.9,0))
+barplot(post, main="tea", 
+        #xlab="parameter", ylab="density", 
+        width = .3, space = 3, ylim = c(0,1),
+        border=rgb(0,.2,0), col=rgb(0,.2,0), add = TRUE)
+legend(legend=c('prior','posterior'),
+       pch=15,x='top',col=c(rgb(.8,.9,0),rgb(0,.2,0)))
+text(x=7,y=.5,'<- With this we could confirm\n the null hypothesis!')
+```
+
+## The Lady Tasting Wine
+Updating the old posterior with new data:
+
+- Suppose our two ladies return with a renewed thirst.
+- They get $\#R_2 = 44$ corrects and $\#W_2 = 0$ errors
+- Update the posterior for the lady tasting wine by multiplying the old posterior with the new data:
+$$\begin{aligned}
+p(P_R &| {\color{blue}\#R}, {\color{blue}\#W}, {\color{gray}\#R_2}, {\color{gray}\#W_2}, {\color{red}wine}) = \\
+S_w & \times {\color{red}K_w (1.01 - P_R)(P_R - 0.49)} \\
+    & \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}} \times {\color{gray}C (1 - P_R)^{\#W_2} P_R^{\#R_2}}
+\end{aligned}$$
+- ... which is equal to:
+$$\begin{aligned}
+p(P_R &| {\color{blue}\#R+\#R_2}, {\color{blue}\#W+\#W_2}, {\color{red}wine}) = \\
+S_w & \times {\color{red}K_w (1.01 - P_R)(P_R - 0.49)} \\
+    & \times {\color{blue}C (1 - P_R)^{\#W+\#W_2} P_R^{\#R+\#R_2}}
+\end{aligned}$$
+
+
+## The Lady Tasting Wine
+```{r fig.width = 5, fig.height = 4, fig.align='center', echo=FALSE, trap6}
+rm(list=ls())
+W <- 1
+R <- 49    # <- the only change
+
+x <- seq(0.5, 1.0, .05)
+prior.usc <- (1.01 - x) * (x - 0.49)
+k <- 1/sum(prior.usc)
+prior <- prior.usc * k
+
+likelihood.usc <- (1-x)^W * x^R
+
+post.usc <- prior * likelihood.usc
+
+stc <- 1/sum(post.usc)
+post <- post.usc * stc
+
+barplot(prior, main="wine", 
+        #xlab="parameter", ylab="density",
+        names.arg=x, ylim = c(0,1),
+        border=rgb(.7,0,0), col=rgb(.7,0,0))
+barplot(post, main="wine",
+        #xlab="parameter", ylab="density",
+        width = .3, space = 3, ylim = c(0,1),
+        border=rgb(1,.5,.5), col=rgb(1,.5,.5), add = TRUE)
+legend(legend=c('prior','posterior'),
+       pch=15,x='top',col=c(rgb(.7,0,0),rgb(1,.5,.5)))
+
+```
+
+## The Lady Tasting Wine
+```{r fig.width = 5, fig.height = 4, fig.align='center', echo=FALSE, trap7}
+rm(list=ls())
+W <- 1
+R <- 49
+
+x <- seq(0.5, 1.0, .05)
+prior.usc <- 1 - x[2:11]
+k <- 1/sum(prior.usc)
+
+prior <- c(.8, 0.2 * prior.usc * k)
+
+likelihood <- (1-x)^W * x^R
+
+post.usc <- prior * likelihood
+
+stc <- 1/sum(post.usc)
+post <- post.usc * stc
+
+barplot(prior, main="tea", 
+        #xlab="parameter", ylab="density", 
+        names.arg=x, ylim = c(0,1),
+        border=rgb(.8,.9,0), col=rgb(.8,.9,0))
+barplot(post, main="tea",
+        #xlab="parameter", ylab="density", 
+        width = .3, space = 3, ylim = c(0,1),
+        border=rgb(0,.2,0), col=rgb(0,.2,0), add = TRUE)
+legend(legend=c('prior','posterior'),
+       pch=15,x='top',col=c(rgb(.8,.9,0),rgb(0,.2,0)))
+
+```
+
+
+## The Lady Tasting Wine
+- With enough data, the prior washes out in favor of the data
+    - How many additional correct discriminations will it take before we conclude that $P_R = 1$?
+        - Ha! Trick question! Since they already made an error, $P_R$ can never be 1!
+    - Alright, suppose that the ladies actually made no error in the first 6 trials. How many more will it take before the posterior
+probability of $P_R = 1$ dominates the alternatives?
+         - After 34 corrects, $p(P_R |data)$ for wine tasting accrues at $P_R = 1$
+         - ... but nothing Dr. Muriel does will convince us that $P_R = 1$, because a priori, $p(P_R = 1) = 0$. Cromwell's rule is the recommendation to give a prior nonzero mass at any point that is not a logical impossibility.
+
+## Summary
+- Fisher argued for a dichotomy: either
+      (a) an event of small probability under $H_0$ has occurred, or
+      (b) $H_0$ is false
+- This did not work
+    - the probability needs to include events that did not occur but were as, or more, extreme
+- This did not work either
+    - it is ambiguous what is 'more extreme'
+- The solution involves Bayes' theorem
+    - Compare probabilities of the data under $H_0$ and alternatives
+    - Different hypotheses weighted by prior beliefs
+    - Priors are modified by the data to yield posterior beliefs
+    - Then compare the various possible explanations for what has happened, and compare posterior beliefs with priors
+ 
+## Summary   
+- Classical analysis is biased against $H_0$
+    - The classical "significance level" is typically less than the posterior probability of $H_0$
+    - $H_0$ will be more easily discounted using Fisher's method than with the Bayesian approach
+        - The vast number of significance tests that are used today will encourage specious beliefs in the efficacy of drugs, treatments, or experimental manipulations
+        - Whenever you read some effect having been detected, remember that it probably refers to significance, which too easily suggests an effect when none exists
+
+## Summary   
+- Bayesian analysis gives us everything we want
+    - We (usually) either want to know
+        - if $H_0$ is true (as with tea), or 
+        - how big an effect is (as with wine)
+    - The posterior tells us exactly what we need to know
+        - In contrast to the $p$-value, which is a probability for something that did not happen under the assumption of a hypothesis that may not be true
+    
+## Conclusions
+- Bayesian analysis uses prior knowledge
+    - Fisher's analysis uses only probabilities assuming guessing and does not handle alternative hypotheses
+    - The Bayesian view recognizes that ones opinion of tasting the two liquids may be different or that the ladies may have different skills
+    
+## Conclusions
+- Bayesian analysis is comparative
+    - We compare the probabilities of the observed event under $H_0$ and under the alternatives
+    - Contrast with Fisher's approach which involves only
+the probability of the data under $H_0$
+    - If evidence is produced to support some thesis, one must also consider the reasonableness of the evidence were the thesis false

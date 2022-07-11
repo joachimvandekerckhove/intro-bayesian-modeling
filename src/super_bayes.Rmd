@@ -1,0 +1,243 @@
+---
+title: "Posterior inference"
+author: "Joachim Vandekerckhove"
+output:
+  beamer_presentation:
+    incremental: yes
+knit: (function(inputFile, encoding) {
+    rmarkdown::render(inputFile, encoding = encoding, output_dir = "../pdf")
+  })
+---
+
+## Posterior inference
+- The posterior distribution gives a lot of information
+- Ideally, we could just show a graph of it and leave the interpretation to the reader
+    - But often the posterior will have many dimensions
+    - And also that seems lazy
+- We need a way to describe the posterior distribution
+    - Mean? SD? Skew? Kurtosis? Mass at or around a certain value? $p(.8 \leq P_R \leq .9|\#R,\#W)$?
+    
+## Posterior inference
+Determining these summary statistics analytically can be daunting and may in fact not be possible in general.\pause
+
+Here, with the discrete domain of $P_R$: \begin{align*}
+p(.8 \leq P_R & \leq .9 | \#R, \#W) = \\
+    & p(P_R = .80 | \#R, \#W) \\
+  + & p(P_R = .85 | \#R, \#W) \\
+  + & p(P_R = .90 | \#R, \#W)
+\end{align*}
+
+## Posterior inference
+- A more continuous case on $x = \frac{P_R +1}{2}$
+    - $p(x) = K x^{\alpha-1}  (1 - x)^{\beta-1} = B(x|\alpha, \beta)$
+    - Beta distribution, say $\alpha = \beta = 2$\pause
+
+```{r fig.width = 4, fig.height = 3, fig.align='center', echo=FALSE, trap1}
+rm(list=ls())  # clear the workspace
+
+domain <- seq(0.5, 1.0, .005)         # make the domain
+prior.usc <- dbeta(2*domain-1, 2, 2)  # this is the prior for all values
+
+# And make the bar plot:
+barplot(prior.usc, main="wine", 
+        #xlab="parameter", ylab="density",
+        names.arg=domain,
+        border=rgb(.7,0,0), col=rgb(.7,0,0))
+```
+
+## Posterior inference
+- A more continuous case on $x = \frac{P_R +1}{2}$
+    - $p(x) = K x^{\alpha-1}  (1 - x)^{\beta-1} = B(x|\alpha, \beta)$
+    - Beta distribution, say $\alpha = \beta = 2$
+    - Likelihood is the same:
+$p(\#R, \#W | P_R) = C P_R^{\#R} (1 - P_R)^{\#W}$
+    - So the posterior must be:
+$p(P_R | \#R, \#W) \propto \left(\frac{P_R +1}{2}\right)^{\alpha-1} \left(1-\frac{P_R +1}{2}\right)^{\beta-1}$
+
+
+## Functional programming {.build}
+Sometimes it is useful in R to turn a function into a variable to change it quickly
+
+You can make a function "on the fly" inside a function or script file like this:
+```{r eval=FALSE, echo=TRUE}
+funcname <- function(n, x) { rep(x, n) }
+```
+
+So that prior and likelihood can be written like:
+```{r eval=FALSE, echo=TRUE}
+prior <- function(p) { dbeta(2 * (p-.5), 2, 2) }
+likelihood <- function(p) { dbinom(5, 6, p) }
+```
+
+## Functional programming
+Prior and likelihood:
+```{r eval=TRUE, echo=TRUE}
+prior <- function(p) { dbeta(2 * (p-.5), 2, 2) }
+likelihood <- function(p) { dbinom(5, 6, p) }
+```
+
+Given those, building the posterior is trivial:
+```{r eval=TRUE, echo=TRUE}
+post.usc  <- function(p) { prior(p) * likelihood(p) }
+```
+
+Exercise: implement this, plot the three functions
+
+## Functional programming
+```{r fig.width = 4, fig.height = 3, fig.align='center', eval=TRUE, echo=TRUE}
+par(mfrow=c(1,3))
+curve(prior, 0.5, 1)
+curve(likelihood, 0.5, 1)
+curve(post.usc, 0.5, 1)
+```
+
+## Posterior inference
+- These graphs don’t tell us the mean of the posterior (or any other useful statistic)
+- How do we determine the mean of an arbitrary, somewhat complicated function?
+- As it turns out, drawing random samples from a distribution is an efficient way to do that
+    - Methods for doing this are called Monte Carlo methods
+    - Math win: Monte Carlo methods don't need those hard-to-compute K and C scaling constants
+    
+## Posterior sampling {.build}
+One Monte Carlo method is the rejection sampler:
+
+1) Draw a sample from some basic distribution $S(x| ... )$
+2) Reject the sample with probability $q = \frac{f{x}}{M\times S(x)}$, where $M$ is chosen so that this is always $\leq 1$ (but ideally sometimes close to 1)
+
+```{r fig.width = 4, fig.height = 3, fig.align='center', echo=FALSE, trap2}
+par(mfrow=c(1, 1))
+curve(post.usc, 0.5, 1)
+lines(c(0.5, 0.5), c(.00, .57), col='red')
+lines(c(0.5, 1.0), c(.57, .57), col='red')
+lines(c(1.0, 1.0), c(.00, .57), col='red')
+text(x=.75, y=.2, 'M = .567')
+```
+
+## Posterior sampling
+- Exercise: Implement a rejection algorithm
+1. Sample $P_R$ from $g(P_R) = U(0.5,1.0)$ and $u$ from $U(0,1)$
+2. Check if $u < p(P_R | \#R, \#W)/M$ (or, better, if $uM < p(P_R| \#R, \#W)$)
+    - If true, accept $x$
+    - Otherwise, reject the value and draw a new sample
+3. Repeat many times to get a few thousand samples
+4. Make a histogram and compare the shapes of the distribution
+
+## Posterior sampling
+```{r fig.width = 4, fig.height = 3, fig.align='center', eval=FALSE, trap4}
+N <- 10000
+x <- vector(,N)
+c <- 1
+M <- .567
+while(c <= N) {
+  x[c] <- runif(1, 0.5, 1)
+  u <- runif(1, 0, M)
+  if (u < post.usc(x[c])) c <- c + 1;
+}
+hist(x, breaks=25,freq=FALSE)
+K <- integrate(post.usc, 0.5, 1)$value
+lines(domain, post.usc(domain)/K, lwd=3, col='red')
+```
+
+## Posterior sampling
+```{r fig.width = 4, fig.height = 3, fig.align='center', echo=FALSE, trap6}
+N <- 10000
+x <- vector(,N)
+c <- 1
+M <- .567
+while(c <= N) {
+  x[c] <- runif(1, 0.5, 1)
+  u <- runif(1, 0, M)
+  if (u < post.usc(x[c])) c <- c + 1;
+}
+hist(x, breaks=25,freq=FALSE)
+K <- integrate(post.usc, 0.5, 1)
+lines(domain, post.usc(domain)/K$value, lwd=3, col='red')
+```
+
+
+## Posterior sampling {.build}
+- With a few thousand samples, the shape of the posterior is well approximated
+    - Now we can compute the mean of that sample: `r mean(x)`
+    - ... or the proportion of samples that are > .85: `r mean(x > .85)`
+    - ... or indeed any quality we fancy
+
+## Generative model representation
+- Basic unit of a Bayesian model is a distribution function
+- The posterior is defined through a \emph{generative model representation}
+    - ... which is basically a sequence of distributional assumptions
+
+## Generative model representation
+Let's define a really trivial model ${\mathcal{M}}_t$ in which we estimate the parameters $\mu$ and $\tau$ ($=1/\sigma^2$) of a normal distribution, applied to some data points $d_j$:
+
+$${\mathcal{M}}_t: \begin{cases}
+    {\color{red} \forall{j \in (1,\ldots,J)}: }{\;\;}d_j \sim N(\mu, \tau) \\ 
+    \mu \sim N(0, 0.1)\\ 
+    \tau \sim \Gamma(4, 0.01)\\ 
+\end{cases}$$\pause
+
+Notice how every statement is a distributional assumption! (Either priors on parameters or likelihoods on data.)
+
+
+## JAGS code is (almost) perfect
+$${\mathcal{M}}_s: \begin{cases}
+    \forall{j \in (1,\ldots,J)}: d_j \sim N(\mu, \tau) \\ 
+    \mu \sim N(0, 0.1)\\ 
+    \tau \sim \Gamma(4, 0.01)\\
+\end{cases}$$ 
+
+\bigskip
+The program needs to know the specifics of the model:
+
+    model {
+        for (j in 1:J) {
+            d[j] ~ dnorm(mu, tau)
+        }
+        mu ~ dnorm(0,0.1)
+        tau ~ dgamma(4,0.01)
+    }
+    
+## A psychological model: Signal detection theory
+$${\mathcal{M}}_{sdt}: \begin{cases}
+    \delta \sim N(1, 1)            & \beta \sim N(0, 1)\\
+    \phi_h = \Phi( \delta/2-\beta) & \phi_f = \Phi(-\delta/2-\beta)\\
+    h \sim B(\phi_h, n_s)          & f \sim B(\phi_f, n_n)\\
+\end{cases}$$ \pause
+
+    model {
+        d ~ dnorm(1, 1)             
+        b ~ dnorm(0, 1)
+        
+        phih <- phi( d / 2 - b)     
+        phif <- phi(-d / 2 - b)
+        
+        h ~ dbin(phih, sigtrials)  
+        f ~ dbin(phif, noistrials)
+     }
+
+## A psychological model: Signal detection theory
+```{r fig.width = 4.5, fig.height = 3.5, fig.align='center', message=FALSE, results = 'hide', echo=FALSE, jags}
+library(rjags)
+set.seed(0)
+
+data <- list(h = 32, sigtrials=39, f=12, noistrials=60)
+
+modelString = "
+    model {
+        d ~ dnorm(1, 1)             
+        b ~ dnorm(0, 1)
+        
+        phih <- phi( d / 2 - b)     
+        phif <- phi(-d / 2 - b)
+        
+        h ~ dbin(phih, sigtrials)  
+        f ~ dbin(phif, noistrials)
+     }
+"
+writeLines( modelString , con="sdt.txt") 
+parameters <- c("d",  "b")
+jagsModel = jags.model( file="sdt.txt", data=data, n.chains=3, n.adapt=1000) 
+update(jagsModel, n.iter=1000)
+samples = coda.samples(jagsModel, variable.names=parameters, n.iter=10000)
+
+plot(samples)
+```
