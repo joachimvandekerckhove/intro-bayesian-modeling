@@ -1,0 +1,242 @@
+\documentclass[10pt]{beamer}
+
+\input{includes/jvheader}
+
+\title{Multinomial Processing Tree with JAGS}
+
+\graphicspath{{./figures/}}
+
+\tikzset{% set up for transitions using tikz with beamer overlays
+  invisible/.style={color=black!75!white},
+  color on/.style={alt=#1{}{invisible}},
+  alt/.code args={<#1>#2#3}{%
+    \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+  },
+}
+
+\author[shortname]{Joachim Vandekerckhove, Michael D. Lee}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}[fragile]{Recognition Memory Task}
+In an old/new recognition memory task, participants are asked whether stimuli are ``old'' or ``new''\pause
+
+\begin{center}
+\begin{tabular}{rcc}
+\toprule
+& Stimulus was old & Stimulus was new \\
+\hline
+Pp responds ``old'' & {\color<3->{red}hit}  & {\color<5->{darkgreen}false alarm}\\
+Pp responds ``new'' & {\color<4->{red}miss} & {\color<6->{darkgreen}correct rejection}\\
+\bottomrule
+\end{tabular}
+\end{center}\pause
+
+Probability of a hit = hit rate = {\color<3->{red}$\theta^\mathrm{h}$}\\\pause
+Probability of a miss = miss rate = {\color<4->{red}$1-\theta^\mathrm{h}$}\pause
+
+Probability of a false alarm = false alarm rate = {\color<5->{darkgreen}$\theta^\mathrm{f}$}\\\pause
+Probability of a correct rejection = correct rejection rate = {\color<6->{darkgreen}$1-\theta^\mathrm{f}$}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Multinomial Processing Trees}
+
+Recall that the one-high-threshold model has parameters $\rho$ (probability of remembering) and $\gamma$ (probability of guessing ``old'')\pause
+
+The tree representation shows the ``flow'' of the process
+\null\hspace{-01.5cm}
+\begin{tabular}{ m{5.5cm} m{3cm}}
+  \begin{tikzpicture}[scale=0.65]
+\tikzset{grow'=right}
+\tikzset{execute at begin node=\strut}
+\tikzset{every tree node/.style={anchor=base west}}
+\tikzset{level 1/.style={level distance=60pt}}
+\tikzset{level 2/.style={level distance=60pt}}
+\tikzset{level 3+/.style={level distance=60pt}}
+\Tree [.``old'' 	[.\node[color=red,color on=<4->]{$\rho$};\edge[draw=red,color on=<4->]; \node[color=red,color on=<4->]{``hit''}; ]
+              		[.\node[color=red,color on=<5->]{$\left(1-\rho\right)$}; \edge[draw=red,color on=<5->];	[.\node[color=red,color on=<5->]{$\gamma$}; \edge[draw=red,color on=<5->]; \node[color=red,color on=<5->]{``hit''};  ]
+						[.$\left(1-\gamma\right)$ ``miss'' ]
+ ] ] 
+\end{tikzpicture}
+&
+ \begin{tikzpicture}[scale=0.65]
+\tikzset{grow'=right}
+\tikzset{execute at begin node=\strut}
+\tikzset{every tree node/.style={anchor=base west}}
+\tikzset{level 1/.style={level distance=60pt}}
+\tikzset{level 2/.style={level distance=60pt}}
+\tikzset{level 3+/.style={level distance=60pt}}
+\Tree [.``new''		 [.\node[color=darkgreen,color on=<6->]{$\gamma$}; \edge[draw=darkgreen,color on=<6->]; \node[color=darkgreen,color on=<6->]{``false alarm''};]
+              			[.$\left(1-\gamma\right)$ {``correct rejection''} ]
+ ] ] 
+\end{tikzpicture}
+\end{tabular}\pause
+
+The parameters $\rho$ and $\gamma$ together determine the hit rate $\theta^\mathrm{h}$ and false alarm rate $\theta^\mathrm{f}$
+\begin{eqnarray}
+ \theta^\mathrm{h} &=& {\color<4->{red}\rho} + {\color<5->{red}\left(1-\rho\right)\gamma} \nonumber\\
+ \theta^\mathrm{f} &=& {\color<6->{darkgreen}\gamma} \nonumber
+\end{eqnarray}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{One-High Threshold Model}
+The remembering parameter $\rho$ and the old-guessing parameter $\gamma$ can both take any value with equal likelihood:
+\begin{eqnarray}
+\rho &\sim& \operatorname{uniform}\left(0, 1\right) \nonumber\\
+\gamma &\sim&\operatorname{uniform}\left(0, 1\right) \nonumber
+\end{eqnarray}\pause
+Those parameters can be transformed into hit rates and false alarm rates:
+\begin{eqnarray}
+ \theta^\mathrm{h} &=& {\rho} + {\left(1-\rho\right)\gamma} \nonumber\\
+ \theta^\mathrm{f} &=& {\gamma} \nonumber
+\end{eqnarray}\pause
+Those rates tell us how often old items lead to hits (the data are $k^\mathrm{h}$ hits out of $n_o$ old items) and how often new items lead to false alarms ($k^\mathrm{f}$ false alarms out of $n_n$ new items): 
+\begin{eqnarray}
+ k^\mathrm{h} &\sim& \operatorname{binomial}\left(\theta^\mathrm{h}, n_o\right) \nonumber\\
+ k^\mathrm{f} &\sim& \operatorname{binomial}\left(\theta^\mathrm{f}, n_n\right) \nonumber
+\end{eqnarray}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{One-High Threshold Model}
+	
+\begin{minipage}{0.45\textwidth}
+\begin{eqnarray*}
+	\rho &\sim& \operatorname{uniform}\left(0, 1\right) \\
+\gamma &\sim&\operatorname{uniform}\left(0, 1\right) \\
+ \theta^\mathrm{h} &=& {\rho} + {\left(1-\rho\right)\gamma} \\
+ \theta^\mathrm{f} &=& {\gamma} \\
+ k^\mathrm{h} &\sim& \operatorname{binomial}\left(\theta^\mathrm{h}, n_o\right) \\
+ k^\mathrm{f} &\sim& \operatorname{binomial}\left(\theta^\mathrm{f}, n_n\right) 
+\end{eqnarray*}
+\end{minipage}\pause\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{tabular}{ccc}
+Amyloid Status & Hits & False Alarms \\
+\hline
+negative  & 13  &  0    \\
+{\color<3->{red}~positive~}    &  {\color<3->{red}8} & {\color<3->{red}4}    \\
+negative & 12  & 1 \\
+negative  & 14  & 0 \\
+{\color<3->{red}~positive~} & {\color<3->{red}9}   & {\color<3->{red}4} \\
+\textellipsis & \textellipsis& \textellipsis\\
+\end{tabular}
+\end{minipage}\hspace{1cm}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{One-High Threshold Model}
+	
+\begin{minipage}{0.45\textwidth}
+\begin{eqnarray*}
+	\rho &\sim& \operatorname{uniform}\left(0, 1\right) \\
+\gamma &\sim&\operatorname{uniform}\left(0, 1\right) \\
+ \theta^\mathrm{h} &=& {\rho} + {\left(1-\rho\right)\gamma} \\
+ \theta^\mathrm{f} &=& {\gamma} \\
+ k^\mathrm{h} &\sim& \operatorname{binomial}\left(\theta^\mathrm{h}, n_o\right) \\
+ k^\mathrm{f} &\sim& \operatorname{binomial}\left(\theta^\mathrm{f}, n_n\right) 
+\end{eqnarray*}
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{tabular}{ccc}
+Amyloid Status & Hits & False Alarms \\
+\hline
+{\color{red}~positive~} & {\color{red}8} & {\color{red}4} \\
+{\color{red}~positive~} & {\color{red}9} & {\color{red}4} \\
+~positive~  & 14  &  0  \\
+~positive~  & 14  &  1  \\
+~positive~  & 13  &  2  \\
+\textellipsis & \textellipsis& \textellipsis\\
+\end{tabular}
+\end{minipage}\hspace{1cm}
+
+\end{frame}
+
+
+\begin{frame}[fragile]{One-High Threshold Model}
+	
+\begin{minipage}{0.45\textwidth}
+\begin{eqnarray*}
+	\rho &\sim& \operatorname{uniform}\left(0, 1\right) \\
+\gamma &\sim&\operatorname{uniform}\left(0, 1\right) \\
+ \theta^\mathrm{h} &=& {\rho} + {\left(1-\rho\right)\gamma} \\
+ \theta^\mathrm{f} &=& {\gamma} \\
+ &&{\color{gray}\forall p \in (1,\ldots,P)}\\
+ k^\mathrm{h}_p &\sim& \operatorname{binomial}\left(\theta^\mathrm{h}, n_o\right) \\
+ k^\mathrm{f}_p &\sim& \operatorname{binomial}\left(\theta^\mathrm{f}, n_n\right) 
+\end{eqnarray*}
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{verbatim}
+model{
+  rho   ~ dunif(0, 1)
+  gamma ~ dunif(0, 1)
+  thetaHit = rho + (1-rho)*gamma
+  thetaFA  = gamma
+  for (p in 1:nPeople){
+    hit[p] ~ dbin(thetaHit, nOld)
+    fa[p]  ~ dbin(thetaFA , nNew)
+  }
+}
+\end{verbatim}
+\end{minipage}\hspace{1cm}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Amyloid Positive Inferences}
+Patients remember around {\color{red}60-70\%} of the items, and guess ``old'' {\color{darkgreen}5-10\%} of the time when they do not remember
+
+\begin{table}[h]
+	\centering
+		\begin{tabular}{lrrrrr}
+			\toprule
+			\multicolumn{1}{c}{} & \multicolumn{3}{c}{Posterior} & \multicolumn{2}{c}{95\% Cred.\ Int.}  \\
+			\cline{2-4}\cline{5-6}
+			Parameter & Mean & Median & SD & Lower & Upper   \\
+			\cmidrule[0.4pt]{1-6}
+			gamma & 0.075 & 0.074 & 0.012 & {\color{darkgreen}0.053} & {\color{darkgreen}0.100}   \\
+			rho   & 0.665 & 0.665 & 0.023 & {\color{red}      0.619} & {\color{red}      0.709}  \\
+			\bottomrule
+		\end{tabular}
+\end{table}\pause
+
+\textit{``Convergence of the MCMC procedure was good, with all $\hat{R} < 1.01$.''}
+
+\end{frame}
+
+\begin{frame}[fragile]{Amyloid Positive Inferences}
+
+\begin{table}[h]
+	\centering
+		\begin{tabular}{lrrrrr}
+			\toprule
+			\multicolumn{1}{c}{} & \multicolumn{3}{c}{Posterior} & \multicolumn{2}{c}{95\% Cred.\ Int.}  \\
+			\cline{2-4}\cline{5-6}
+			Parameter & Mean & Median & SD & Lower & Upper   \\
+			\cmidrule[0.4pt]{1-6}
+			gamma & 0.075 & 0.074 & 0.012 & {\color{darkgreen}0.053} & {\color{darkgreen}0.100}   \\
+			rho   & 0.665 & 0.665 & 0.023 & {\color{red}      0.619} & {\color{red}      0.709}  \\
+			\bottomrule
+		\end{tabular}
+\end{table}
+
+	\begin{center}
+\includegraphics[width = 0.44\textwidth, trim = {3cm 0cm 15.02cm 19cm}, clip]{oneHighThreshold_1_betaAmyloidPositive_bivariate.eps}\pause
+\includegraphics[width = 0.54\textwidth, trim = {0cm 1.8cm 3cm 2.25cm}, clip]{oneHighThreshold_1_betaAmyloidPositive.eps}
+	\end{center}
+\end{frame}
+
+
+
+
+\end{document}

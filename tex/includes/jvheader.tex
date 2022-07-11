@@ -1,0 +1,136 @@
+\usepackage{ 
+    amsmath,
+    amssymb,
+    array,
+    apacite,
+    beamerthemesplit,
+    bm,
+    booktabs,
+    catchfilebetweentags,
+    color,
+    colortbl,
+    csquotes,
+    enumitem,
+    epigraph,
+    fancyvrb,
+    fontawesome,
+    graphicx,
+    hyperref,
+    pifont,
+    scalerel,
+    tabularx,
+    tikz,
+    tikz-qtree,
+    xcolor,
+    xfrac}
+
+
+% Theme modifications
+\usetheme[progressbar=foot]{metropolis}
+\addtobeamertemplate{frametitle}{}{\vspace{1em}}
+\renewcommand{\emph}[1]{{{\color{red}#1}}}
+\renewcommand\bibliographytypesize{\footnotesize}
+
+\setbeamercolor{block title}{use=structure,fg=black,bg=black!15!white}
+\setbeamercolor{block body}{use=structure,fg=black,bg=black!10!white}
+
+\setbeamercolor{background canvas}{bg=white}
+%\setbeamercolor{normal text}{fg=black}
+
+\renewcommand\bibliographytypesize{\footnotesize}
+
+\setlist[enumerate]{label=\bf\alph*)}
+
+\addtobeamertemplate{block begin}{\vskip +1.5\bigskipamount}{}
+\addtobeamertemplate{block end}{}{\vskip -1.5\bigskipamount}
+
+
+% Super lazy shorthands
+\newcommand{\e}[1]{\emph{#1}}
+\newcommand{\strng}[1]{{{\color{jade}#1}}}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\renewcommand{\i}{\item[$\bullet$]<+->}
+
+\newcommand{\ex}[1]{\begin{block}{#1}\vspace{0pt}}
+\newcommand{\xe}{\end{block}\vspace{3ex}}
+
+\newcommand{\beq}{\begin{eqnarray*}}
+\newcommand{\eeq}{\end{eqnarray*}}
+
+\renewcommand{\c}[2]{{\color{#1}\texttt{#2}}}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+
+% Font
+\usefonttheme[onlymath]{serif}
+
+% Unusual symbols
+\newcommand{\cmark}{\ding{51}}% Check mark
+\newcommand{\xmark}{\ding{55}}% Cross mark
+\let\lightning\faBolt % Lightning bolt
+
+
+% Colors
+\definecolor{amber}{rgb} {0.99, 0.75, 0.20}
+\definecolor{violet}{rgb}{0.55, 0.20, 0.90}
+\definecolor{jade}{rgb}  {0.00, 0.66, 0.42}
+\definecolor{blue}{rgb}  {0.00, 0.39, 0.64}
+\definecolor{gold}{rgb}  {1.00, 0.82, 0.00}
+\definecolor{lightgrey}{rgb}  {0.85, 0.85, 0.85}
+\definecolor{offwhite}{rgb}   {0.965, 0.965, 0.965}
+\definecolor{paleyellow}{rgb} {1, .975, 0.85}
+\definecolor{bordeaux}{rgb}   {0.50, 0.10, 0.10}
+\definecolor{royalblue}{rgb}  {0.26, 0.41, 0.88}
+\definecolor{darkgreen}{rgb}  {0.10, 0.50, 0.10}
+
+\definecolor{titleCiteAColor}{rgb} {0.5, 0.7, 0.85}
+\definecolor{titleCiteColor}{rgb}  {0.5, 0.7, 0.85}
+
+
+% Hyperlink colors
+\hypersetup{
+    citecolor=,  % Clear global citecolor, see below
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+
+% Extend cite for color
+\let\plainCiteA\citeA
+\renewcommand{\citeA}[2][gray]{{\color{#1}\plainCiteA{#2}}}
+\let\plainCite\cite
+\renewcommand{\cite}[2][gray]{{\color{#1}\plainCite{#2}}}
+
+\newcommand{\titleCiteA}[1]{\citeA[titleCiteAColor]{#1}}
+\newcommand{\titleCite}[1]{\cite[titleCiteColor]{#1}}
+
+
+% Math and logic notation
+\newcommand{\given}{{ \mid }}
+
+\newcommand{\lxor}{\veebar}
+\renewcommand{\l}[1]{\mbox{ \sc{#1} }}
+
+\renewcommand{\therefore}{\Rightarrow}
+\renewcommand{\implies}{\rightarrow}
+\newcommand{\equivalent}{\leftrightarrow}
+\newcommand{\nonequivalent}{\not\leftrightarrow}
+
+
+% Graphics
+\usepackage{graphicx}
+\graphicspath{ {p/} }
+
+\usetikzlibrary{trees}
+\usetikzlibrary{tikzmark}
+
+
+% Title page defaults
+\author[shortname]{Joachim Vandekerckhove\\Michael D. Lee}
+\date{}
+

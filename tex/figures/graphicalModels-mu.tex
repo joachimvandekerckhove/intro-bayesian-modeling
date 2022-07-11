@@ -1,0 +1,332 @@
+% An example graphical model, based on a general(ish) set of definitions
+% Michael Lee (mdlee@uci.edu)
+% Jan 2018
+% 
+% to convert to eps download GNU ps tools (https://sourceforge.net/projects/gnuwin32/?source=typ_redirect)
+% then use (MSDOS) command line of form
+% pdftops -eps graphicalModel.pdf test.eps
+% to do second page, for example ...
+% pdftops -eps -f 2 -l 2 graphicalModel.pdf test.eps
+
+\documentclass[12pt]{article}
+
+% packages
+\usepackage{tikz}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{bm}
+\usetikzlibrary{shadows,fit,positioning,arrows,intersections}
+
+\usepackage{tikz-qtree}
+\usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,
+                arrows,positioning,trees,fit}
+\usetikzlibrary{trees}
+% Set the overall layout of the tree
+\tikzstyle{level 1}=[level distance=2.5cm, sibling distance=3.5cm]
+\tikzstyle{level 2}=[level distance=2.5cm, sibling distance=2cm]
+
+% Define styles for bags and leafs
+\tikzstyle{bag} = [text width=4em, text centered]
+\tikzstyle{end} = [circle, minimum width=3pt,fill, inner sep=0pt]
+
+% stuff from somewhere
+\makeatletter
+\pgfkeys{/pgf/.cd,
+  rectangle corner radius/.initial=3pt
+}
+\newif\ifpgf@rectanglewrc@donecorner@
+\def\pgf@rectanglewithroundedcorners@docorner#1#2#3#4{%
+  \edef\pgf@marshal{%
+    \noexpand\pgfintersectionofpaths
+      {%
+        \noexpand\pgfpathmoveto{\noexpand\pgfpoint{\the\pgf@xa}{\the\pgf@ya}}%
+        \noexpand\pgfpathlineto{\noexpand\pgfpoint{\the\pgf@x}{\the\pgf@y}}%
+      }%
+      {%
+        \noexpand\pgfpathmoveto{\noexpand\pgfpointadd
+          {\noexpand\pgfpoint{\the\pgf@xc}{\the\pgf@yc}}%
+          {\noexpand\pgfpoint{#1}{#2}}}%
+        \noexpand\pgfpatharc{#3}{#4}{\cornerradius}%
+      }%
+    }%
+  \pgf@process{\pgf@marshal\pgfpointintersectionsolution{1}}%
+  \pgf@process{\pgftransforminvert\pgfpointtransformed{}}%
+  \pgf@rectanglewrc@donecorner@true
+}
+\pgfdeclareshape{rectangle with rounded corners}
+{
+  \inheritsavedanchors[from=rectangle] % this is nearly a rectangle
+  \inheritanchor[from=rectangle]{north}
+  \inheritanchor[from=rectangle]{north west}
+  \inheritanchor[from=rectangle]{north east}
+  \inheritanchor[from=rectangle]{center}
+  \inheritanchor[from=rectangle]{west}
+  \inheritanchor[from=rectangle]{east}
+  \inheritanchor[from=rectangle]{mid}
+  \inheritanchor[from=rectangle]{mid west}
+  \inheritanchor[from=rectangle]{mid east}
+  \inheritanchor[from=rectangle]{base}
+  \inheritanchor[from=rectangle]{base west}
+  \inheritanchor[from=rectangle]{base east}
+  \inheritanchor[from=rectangle]{south}
+  \inheritanchor[from=rectangle]{south west}
+  \inheritanchor[from=rectangle]{south east}
+
+  \savedmacro\cornerradius{%
+    \edef\cornerradius{\pgfkeysvalueof{/pgf/rectangle corner radius}}%
+  }
+
+  \backgroundpath{%
+    \northeast\advance\pgf@y-\cornerradius\relax
+    \pgfpathmoveto{}%
+    \pgfpatharc{0}{90}{\cornerradius}%
+    \northeast\pgf@ya=\pgf@y\southwest\advance\pgf@x\cornerradius\relax\pgf@y=\pgf@ya
+    \pgfpathlineto{}%
+    \pgfpatharc{90}{180}{\cornerradius}%
+    \southwest\advance\pgf@y\cornerradius\relax
+    \pgfpathlineto{}%
+    \pgfpatharc{180}{270}{\cornerradius}%
+    \northeast\pgf@xa=\pgf@x\advance\pgf@xa-\cornerradius\southwest\pgf@x=\pgf@xa
+    \pgfpathlineto{}%
+    \pgfpatharc{270}{360}{\cornerradius}%
+    \northeast\advance\pgf@y-\cornerradius\relax
+    \pgfpathlineto{}%
+  }
+
+  \anchor{before north east}{\northeast\advance\pgf@y-\cornerradius}
+  \anchor{after north east}{\northeast\advance\pgf@x-\cornerradius}
+  \anchor{before north west}{\southwest\pgf@xa=\pgf@x\advance\pgf@xa\cornerradius
+    \northeast\pgf@x=\pgf@xa}
+  \anchor{after north west}{\northeast\pgf@ya=\pgf@y\advance\pgf@ya-\cornerradius
+    \southwest\pgf@y=\pgf@ya}
+  \anchor{before south west}{\southwest\advance\pgf@y\cornerradius}
+  \anchor{after south west}{\southwest\advance\pgf@x\cornerradius}
+  \anchor{before south east}{\northeast\pgf@xa=\pgf@x\advance\pgf@xa-\cornerradius
+    \southwest\pgf@x=\pgf@xa}
+  \anchor{after south east}{\southwest\pgf@ya=\pgf@y\advance\pgf@ya\cornerradius
+    \northeast\pgf@y=\pgf@ya}
+
+  \anchorborder{%
+    \pgf@xb=\pgf@x% xb/yb is target
+    \pgf@yb=\pgf@y%
+    \southwest%
+    \pgf@xa=\pgf@x% xa/ya is se
+    \pgf@ya=\pgf@y%
+    \northeast%
+    \advance\pgf@x by-\pgf@xa%
+    \advance\pgf@y by-\pgf@ya%
+    \pgf@xc=.5\pgf@x% x/y is half width/height
+    \pgf@yc=.5\pgf@y%
+    \advance\pgf@xa by\pgf@xc% xa/ya becomes center
+    \advance\pgf@ya by\pgf@yc%
+    \edef\pgf@marshal{%
+      \noexpand\pgfpointborderrectangle
+      {\noexpand\pgfqpoint{\the\pgf@xb}{\the\pgf@yb}}
+      {\noexpand\pgfqpoint{\the\pgf@xc}{\the\pgf@yc}}%
+    }%
+    \pgf@process{\pgf@marshal}%
+    \advance\pgf@x by\pgf@xa% 
+    \advance\pgf@y by\pgf@ya%
+    \pgfextract@process\borderpoint{}%
+    %
+    \pgf@rectanglewrc@donecorner@false
+    %
+    % do southwest corner
+    \southwest\pgf@xc=\pgf@x\pgf@yc=\pgf@y
+    \advance\pgf@xc\cornerradius\relax\advance\pgf@yc\cornerradius\relax 
+    \borderpoint
+    \ifdim\pgf@x<\pgf@xc\relax\ifdim\pgf@y<\pgf@yc\relax
+      \pgf@rectanglewithroundedcorners@docorner{-\cornerradius}{0pt}{180}{270}%
+    \fi\fi
+    %
+    % do southeast corner
+    \ifpgf@rectanglewrc@donecorner@\else
+      \southwest\pgf@yc=\pgf@y\relax\northeast\pgf@xc=\pgf@x\relax
+      \advance\pgf@xc-\cornerradius\relax\advance\pgf@yc\cornerradius\relax
+      \borderpoint
+      \ifdim\pgf@x>\pgf@xc\relax\ifdim\pgf@y<\pgf@yc\relax
+       \pgf@rectanglewithroundedcorners@docorner{0pt}{-\cornerradius}{270}{360}%
+      \fi\fi
+    \fi
+    %
+    % do northeast corner
+    \ifpgf@rectanglewrc@donecorner@\else
+      \northeast\pgf@xc=\pgf@x\relax\pgf@yc=\pgf@y\relax
+      \advance\pgf@xc-\cornerradius\relax\advance\pgf@yc-\cornerradius\relax
+      \borderpoint
+      \ifdim\pgf@x>\pgf@xc\relax\ifdim\pgf@y>\pgf@yc\relax
+       \pgf@rectanglewithroundedcorners@docorner{\cornerradius}{0pt}{0}{90}%
+      \fi\fi
+    \fi
+    %
+    % do northwest corner
+    \ifpgf@rectanglewrc@donecorner@\else
+      \northeast\pgf@yc=\pgf@y\relax\southwest\pgf@xc=\pgf@x\relax
+      \advance\pgf@xc\cornerradius\relax\advance\pgf@yc-\cornerradius\relax
+      \borderpoint
+      \ifdim\pgf@x<\pgf@xc\relax\ifdim\pgf@y>\pgf@yc\relax
+       \pgf@rectanglewithroundedcorners@docorner{0pt}{\cornerradius}{90}{180}%
+      \fi\fi
+    \fi
+  }
+}
+
+% Document starts here
+\begin{document}
+
+% use the whole page (especially for this example model, which needs it)
+\setlength{\parindent}{-4cm}
+
+% Colors for observed and partially observed nodes
+\definecolor{lightgray}{RGB}{180,180,180}
+\definecolor{verylightgray}{RGB}{220,220,220}
+
+% Definitions of node types
+\tikzstyle{discreteDeterministic} = [draw,  minimum size = 13mm, thick, draw = black, node distance = 10mm, fill  = white, line width = 1pt]
+\tikzstyle{discreteDeterministicObserved} = [draw,  minimum size = 13mm, thick, draw = black, node distance = 10mm, fill  = white, line width = 1pt]
+\tikzstyle{discreteObserved} = [draw,  minimum size = 11mm, thick, draw = black, node distance = 10mm, fill  = lightgray, line width = 1pt]
+\tikzstyle{discretePartialObserved} = [draw,  minimum size = 11mm, thick, draw = black, node distance = 10mm, fill  = verylightgray, line width = 1pt]
+\tikzstyle{discreteLatent} = [draw,  minimum size = 11mm, thick, draw = black, node distance = 10mm, fill  = white, line width = 1pt]
+\tikzstyle{continuousDeterministic} = [circle,  minimum size = 14mm, thick, draw = black, node distance = 10mm, fill  = white, line width = 1pt]
+\tikzstyle{continuousDeterministicObserved} = [circle,  minimum size = 14mm, thick, draw = black, node distance = 10mm, fill  = white, line width = 1pt]
+\tikzstyle{continuousObserved} = [circle, minimum size = 12mm, thick, draw = black, node distance = 10mm, fill = lightgray, line width = 1pt]
+\tikzstyle{continuousPartialObserved} = [circle, minimum size = 12mm, thick, draw = black, node distance = 10mm, fill = verylightgray, line width = 1pt]
+\tikzstyle{continuousLatent} = [circle, minimum size = 12mm, thick, draw = black, node distance = 10mm, line width = 1pt]
+\tikzstyle{plate} = [rectangle with rounded corners, draw = black, rectangle corner radius = 6pt, align = center, line width = 1pt, yshift = -4]
+\tikzstyle{spacer} = [opacity = 0, minimum size = 1mm] {};
+\tikzstyle{connect} = [-stealth, thick, line width = 1pt]
+
+\pagestyle{empty}
+
+  %----------------------------------------------------------------------------------
+  % Single high threshold, conceptual
+  %----------------------------------------------------------------------------------
+  
+\begin{tabular}{ m{8.5cm} m{5.5cm}}
+  \begin{tikzpicture}
+\tikzset{grow'=right}
+\tikzset{execute at begin node=\strut}
+\tikzset{every tree node/.style={anchor=base west}}
+\tikzset{level 1/.style={level distance=60pt}}
+\tikzset{level 2/.style={level distance=60pt}}
+\tikzset{level 3+/.style={level distance=60pt}}
+\Tree [.``old'' 	[.$\rho$ ``hit'' ]
+              		[.$\left(1-\rho\right)$ 	[.$\gamma$ ``hit''  ]
+						[.$\left(1-\gamma\right)$ ``miss'' ]
+ ] ] 
+\end{tikzpicture}
+&
+
+ \begin{tikzpicture}
+\tikzset{grow'=right}
+\tikzset{execute at begin node=\strut}
+\tikzset{every tree node/.style={anchor=base west}}
+\tikzset{level 1/.style={level distance=60pt}}
+\tikzset{level 2/.style={level distance=60pt}}
+\tikzset{level 3+/.style={level distance=60pt}}
+\Tree [.``new''		 [.$\gamma$ {``false alarm''} ]
+              			[.$\left(1-\gamma\right)$ {``correct rejection''} ]
+ ] ] 
+\end{tikzpicture}
+
+\end{tabular}
+
+
+
+ %----------------------------------------------------------------------------------
+  % Two high threshold, conceptual
+  %----------------------------------------------------------------------------------
+  
+  \newpage
+\begin{tabular}{ m{8.5cm} m{5.5cm}}
+  \begin{tikzpicture}
+\tikzset{grow'=right}
+\tikzset{execute at begin node=\strut}
+\tikzset{every tree node/.style={anchor=base west}}
+\tikzset{level 1/.style={level distance=60pt}}
+\tikzset{level 2/.style={level distance=60pt}}
+\tikzset{level 3+/.style={level distance=60pt}}
+\Tree [.``old'' 	[.$\rho$ ``hit'' ]
+              		[.$\left(1-\rho\right)$ 	[.$\gamma$ ``hit''  ]
+						[.$\left(1-\gamma\right)$ ``miss'' ]
+ ] ] 
+\end{tikzpicture}
+&
+
+ \begin{tikzpicture}
+\tikzset{grow'=right}
+\tikzset{execute at begin node=\strut}
+\tikzset{every tree node/.style={anchor=base west}}
+\tikzset{level 1/.style={level distance=60pt}}
+\tikzset{level 2/.style={level distance=60pt}}
+\tikzset{level 3+/.style={level distance=60pt}}
+\Tree [.``new'' 	[.$\rho$ {``correct rejection'}' ]
+              		[.$\left(1-\rho\right)$ 	[.$\gamma$ {``false alarm''}  ]
+						[.$\left(1-\gamma\right)$ {``correct rejection''} ]
+ ] ] 
+\end{tikzpicture}
+
+\end{tabular}
+
+
+
+ %----------------------------------------------------------------------------------
+  % Weapon priming, conceptual, based heavily on Heck et al Figure 3
+  %----------------------------------------------------------------------------------
+  
+  \newpage
+
+ \begin{tikzpicture}[grow=right]
+    \tikzset{grow'=right, level distance=55pt,
+    		% level 1/.style ={level distance=3cm}
+    		 %level 4/.style ={level distance=1.5cm}
+    		 }
+    		   \tikzstyle{level 1}=[sibling distance=5mm, level distance=3cm]
+    		     \tikzstyle{level 2}=[sibling distance=5mm, level distance=2cm]
+    		   \tikzstyle{level 3}=[sibling distance=5mm, level distance=2cm]
+    \tikzset{execute at begin node=\strut}
+    \tikzset{every tree node/.style={anchor=base west}}
+    \Tree [.\node[](Stroop){\textbf{Stimulus}}; 
+		    [.\node[draw=none](A){$\alpha$};
+		    	[.\node{};
+		    		[ .\node{};
+		    			[.\node(c1)[]{}; ]
+		    		]
+		    	]
+		    ]
+		    [.$1-\alpha$
+				[.\node[draw=none](C){$\beta$};
+					[ .\node{};
+						[.\node(c2)[]{}; ]
+					]   
+				]
+				[.$1-\beta$ 
+					[.$\gamma$   {}   ]
+					[.$1-\gamma$ {}  ] 
+				]
+			] 
+		  ]
+\draw[-] (A)--(c1);
+\draw[-] (C)--(c2);
+\newcommand\sibdist{2.5cm}
+\matrix(m)[% table as tikz matrix
+        matrix of nodes,
+        xshift=11cm,
+        yshift=0.575cm,
+        nodes={inner xsep=\tabcolsep,minimum height=0.5*\sibdist},
+      ]{
+        \textbf{Prime:}  & White & White & Black & Black\\
+        \textbf{Target:} & Tool  & Gun   & Tool  & Gun\\
+        & $+$ & $-$ & $-$ & $+$ \\ %[.5*\sibdist]
+        & $+$ & $+$ & $+$ & $+$ \\
+        & $+$ & $-$ & $+$ & $-$ \\
+        & $-$ & $+$ & $-$ & $+$ \\
+    };
+    \foreach \i in {2,...,5}\node[draw,fit=(m-1-\i) (m-2-\i) (m-3-\i) (m-4-\i)(m-5-\i)(m-6-\i),inner sep=-.5\pgflinewidth](c\i){};
+\end{tikzpicture}
+
+
+
+  
+\end{document}
+
