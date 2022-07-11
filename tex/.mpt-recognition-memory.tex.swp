@@ -53,7 +53,7 @@ Answer ``New'' & miss & correct rejection\\
 \end{frame}
 
 \begin{frame}[fragile]{One-High Threshold Model}
-\includegraphics[width = \textwidth]{figures/oneHighThreshold.eps}
+\includegraphics[width = \textwidth]{oneHighThreshold.eps}
 \vspace{0.5em}
 \bi
 \i The one-high threshold MPT model assumes that a participant has some probability of remembering an item was on the study list
@@ -70,7 +70,7 @@ Answer ``New'' & miss & correct rejection\\
 \end{frame}
 
 \begin{frame}[fragile]{One-High Threshold Model}
-\includegraphics[width = \textwidth]{figures/oneHighThreshold.eps}
+\includegraphics[width = \textwidth]{oneHighThreshold.eps}
 \vspace{0.5em}
 \bi
 \i The remembering and guessing parameters can be inferred based solely on the counts of the numbers of hits and false alarms from the number of old and new test trials
@@ -165,7 +165,7 @@ positive   &  9   & 4 \\
 \end{frame}
 
 \begin{frame}[fragile]{Two-High Threshold Model}
-\includegraphics[width = \textwidth]{figures/twoHighThreshold.eps}
+\includegraphics[width = \textwidth]{twoHighThreshold.eps}
 \vspace{0.5em}
 \bi
 \i The new assumptions do not change how hits are produced
