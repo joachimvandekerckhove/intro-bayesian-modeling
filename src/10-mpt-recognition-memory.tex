@@ -1,0 +1,222 @@
+\documentclass[10pt]{beamer}
+
+  \input{./src/includes/jvheader}
+  \graphicspath{{./src/includes/}}
+  \author[shortname]{Michael D. Lee, Joachim Vandekerckhove}
+
+  \title{Multinomial Processing Tree Models of Recognition Memory}
+
+\begin{document}
+
+
+\maketitle
+
+
+\begin{frame}[fragile]{Multinomial Processing Trees}
+	\begin{itemize}
+		\item Multinomial Processing Trees (MPTs) are a modeling approach (not a specific model), and have been used in a wide variety of areas including memory, decision making, and social psychology \cite{BatchelderRiefer1980,erdfelder2009multinomial}
+		\item MPTs are usually applied to categorical data
+		      \begin{itemize}
+			      \item e.g., discrete decisions rather than continuous response times
+		      \end{itemize}
+		\item MPTs make assumptions about how the different categories of behavior could be generated, in terms of probabilistic processes controlled by underlying psychological variables
+		\item The easiest way to understand MPTs is with examples
+		      \begin{itemize}
+			      \item two MPT models of recognition memory
+			      \item an MPT model of the weapon-priming effect from social psychology
+		      \end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Recognition memory task}
+	\begin{itemize}
+		\item In an old/new recognition memory task (example \href{https://youtu.be/57fp4Cjtmq0}{here}), there are two parts
+		      \begin{itemize}
+			      \item \textbf{study}: a list of items (words, pictures, ...) are presented, usually one at a time
+			      \item \textbf{test}: a list of items is presented, one at a time, with some items coming from the original study list and some items being new
+		      \end{itemize}
+		\item On each test trial, the participant is asked whether the item is ``old'' or ``new''
+		\item The participant's behavior can be summarized in terms of four counts
+		      \vspace{0.5em}
+		      \begin{center}
+			      \begin{tabular}{rcc}
+				      \toprule
+				                     & Study Item & Not Study Item    \\
+				      \hline
+				      Answer ``Old'' & hit        & false alarm       \\
+				      Answer ``New'' & miss       & correct rejection \\
+				      \bottomrule
+			      \end{tabular}
+		      \end{center}
+		      \vspace{0.5em}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{One-High Threshold Model}
+	\includegraphics[width = \textwidth]{oneHighThreshold.eps}
+	\vspace{0.5em}
+	\begin{itemize}
+		\item The one-high threshold MPT model assumes that a participant has some probability of remembering an item was on the study list
+		      \begin{itemize}
+			      \item if they remember the item, they correctly say ``old''
+			      \item if they do not remember the item (either because it was on the study list but they forget, or because it was not on the study list) they guess
+		      \end{itemize}
+		\item The model has two parameters
+		      \begin{itemize}
+			      \item a probability $\rho$ of remembering a studied item when it is presented during testing
+			      \item a probability $\gamma$ of guessing by responding ``old'' if there is no memory of the item
+		      \end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{One-High Threshold Model}
+	\includegraphics[width = \textwidth]{oneHighThreshold.eps}
+	\vspace{0.5em}
+	\begin{itemize}
+		\item The remembering and guessing parameters can be inferred based solely on the counts of the numbers of hits and false alarms from the number of old and new test trials
+		      \begin{itemize}
+			      \item misses and correct rejections are just the complement of hits and false alarms, and do not provide extra information
+		      \end{itemize}
+		\item The one-high threshold model assume the hit rate $\theta^\mathrm{h}$ and the false alarm rate $\theta^\mathrm{f}$ are
+		      \begin{eqnarray}
+			      \theta^\mathrm{h} &=& \rho + \left(1-\rho\right)\gamma \nonumber\\
+			      \theta^\mathrm{f} &=& \gamma \nonumber
+		      \end{eqnarray}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{One-High Threshold Model}
+\begin{itemize}
+\item For data that have $k^\mathrm{h}$ hits out of $n_o$ old items and  $k^\mathrm{f}$ false alarms out of $n_n$ new items, the one-high threshold model assumes and 
+\begin{eqnarray}
+k^\mathrm{h} &\sim& \operatorname{binomial}\bigl(\theta^\mathrm{h}, n_o\bigr) \nonumber\\
+k^\mathrm{f} &\sim& \operatorname{binomial}\bigl(\theta^\mathrm{f}, n_n\bigr) \nonumber
+\end{eqnarray}
+\item The model also assumes that all remembering rates $\rho$ and guessing rates $\gamma$ are a priori equally likely, so that
+\begin{eqnarray}
+\rho &\sim& \operatorname{uniform}\bigl(0, 1\bigr) \nonumber\\
+\gamma &\sim&\operatorname{uniform}\bigl(0, 1\bigr) \nonumber
+	\end{eqnarray}
+\end{itemize}
+\vspace{5em}
+\end{frame}
+
+
+\begin{frame}[fragile]{Amyloid positivity data}
+	\begin{center}
+		\begin{tabular}{ccc}
+			\toprule
+			Amyloid Status & Hits          & False Alarms  \\
+			\hline
+			positive       & 8             & 4             \\
+			negative       & 12            & 1             \\
+			negative       & 14            & 0             \\
+			positive       & 9             & 4             \\
+			\textellipsis  & \textellipsis & \textellipsis \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	\begin{itemize}
+		\item These data come from a clinical setting, and involve memory ability tests for 60 patients using the Rey auditory verbal learning test \cite{bean2011rey}
+		      \begin{itemize}
+			      \item In the recognition task, the patients study a set of 15 words, and tested on 30 words, made up of 15 old and 15 new words
+		      \end{itemize}
+		\item Patients also had a cerebrospinal fluid measurement taken to classify their levels beta amyloid as ``positive'' or ``negative''
+		      \begin{itemize}
+			      \item amyloid positivity is thought to be a pre-sympotic indicator of Alzheimer's disease
+		      \end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Amyloid negative inferences}
+	\begin{center}
+		{\includegraphics[width = 0.6\textwidth, trim = {0cm 0 0cm 1.75cm}, clip]{oneHighThreshold_1_betaAmyloidNegative.eps}}
+	\end{center}
+	
+	\begin{itemize}
+		\item The figure shows the joint and marginal posterior distributions for the remembering and guessing parameters
+		\item Patients remember around 80\% of the items, and guess ``old'' about 10\% of the time when they do not remember
+	\end{itemize}
+	
+\end{frame}
+
+\begin{frame}[fragile]{Amyloid Positive Inferences}
+	\begin{center}
+		\includegraphics[width = 0.6\textwidth, trim = {0cm 0 0cm 1.5cm}, clip]{oneHighThreshold_1_betaAmyloidPositive.eps}
+	\end{center}
+	\begin{itemize}
+		\item Patients remember around 60-70\% of the items, and guess ``old'' about 10\% of the time when they do not remember
+		\item Very similar guessing behavior to amyloid negative group, but lower probabiiity of remembering
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Two-High Threshold Model}
+	\includegraphics[width = \textwidth]{twoHighThreshold.eps}
+	\vspace{0.5em}
+	\begin{itemize}
+		\item The two-high threshold MPT model has the same two paramaters, and still assumes that a participant has some probability of remembering an item was on the study list
+		\item The decision process during testing now works a little differently
+		      \begin{itemize}
+			      \item if they remember the item, they correctly say ``old''
+			      \item if they remember that the item was \emph{not} on the study list, they correctly say ``new''
+			      \item if they do not remember the item, they guess
+		      \end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Two-High Threshold Model}
+	\includegraphics[width = \textwidth]{twoHighThreshold.eps}
+	\vspace{0.5em}
+	\begin{itemize}
+		\item The new assumptions do not change how hits are produced
+		      \begin{itemize}
+			      \item Either by remembering the item or guessing ``old''
+		      \end{itemize}
+		\item But they do change how false alarms are produced
+		      \begin{itemize}
+			      \item By explicitly remembering the item was not on the list, or by guessing ``old''
+		      \end{itemize}
+		\item The hit rate $\theta^\mathrm{h}$ and the false alarm rate $\theta^\mathrm{f}$ are now
+		      \begin{eqnarray}
+			      \theta^\mathrm{h} &=& \rho + \left(1-\rho\right)\gamma \nonumber\\
+			      \theta^\mathrm{f} &=& \left(1-\rho\right)\gamma \nonumber
+		      \end{eqnarray}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Amyloid negative inferences}
+	\begin{center}
+		{\includegraphics[width = 0.5\textwidth, trim = {0cm 0 0cm 0.cm}, clip]{twoHighThreshold_1_betaAmyloidNegative.eps}}
+	\end{center}
+	\begin{itemize}
+		\item The figure shows the joint and marginal posterior distributions for the remembering and guessing parameters
+		\item Patients remember around 70-80\% of the items, and guess ``old'' about 30\% of the time when they do not remember
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Amyloid positive inferences}
+	\begin{center}
+		\includegraphics[width = 0.5\textwidth, trim = {0cm 0 0cm 1cm}, clip]{twoHighThreshold_1_betaAmyloidPositive.eps}
+	\end{center}
+	\begin{itemize}
+		\item Patients remember around 60\% of the items, and guess ``old'' about 20\% of the time when they do not remember
+		\item The remembering rate is lower, and the guessing rate now also differs between the amyloid negative and positive groups
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Key points}
+	\begin{itemize}
+		\item MPT models make assumptions about how categorical observed behavior can be decomposed into sequences of probabilistic events
+		\item The one-high threshold and two-high threshold models of recognition memory are widely-used MPT models
+		\item The inferences for the amyloid positivity data showed meaningful differences between the clinical groups, but the exact nature of the differences in remembering and guessing depends on the model
+	\end{itemize}
+	\vspace{7em}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{References}
+\bibliographystyle{apacite}
+\bibliography{includes/cogs110B}
+\end{frame}
+
+
+\end{document}
