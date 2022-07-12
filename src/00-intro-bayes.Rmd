@@ -15,7 +15,7 @@ knit: (function(inputFile, encoding) {
 - A practical course in Bayesian statistics is "A Course in Bayesian Graphical Modeling for Cognitive Science" by Michael D. Lee and Eric-Jan Wagenmakers
 http://www.bayesmodels.com/
 - I have not yet read Richard McElreath's "Statistical Rethinking" but I hear very good things
-- Forthcoming (2017) Special issue of Psychonomic Bulletin \& Review
+- Special issue of Psychonomic Bulletin \& Review (volume 25, 2018)
 
 ## Prefacing notes: This is not psychology
 - Bayesian statistics is a set of formal methods for statistical inference, used by statisticians and scientists to make statements about unobserved parameters starting from the observed data
