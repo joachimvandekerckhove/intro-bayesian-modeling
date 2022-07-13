@@ -1,5 +1,5 @@
 RERUN := "(undefined references|Rerun to get (cross-references|the bars|point totals) right|Table widths have changed. Rerun LaTeX.|Linenumber reference failed)"
-RERUNBIB := "No file.*\.bbl|Citation.*undefined"
+RERUNBIB := "No file.*\.bbl|Citation.*undefined|.*There were undefined references"
 
 all: pdf/00-intro-bayes.pdf  pdf/01-medium-bayes.pdf  pdf/02-advanced-bayes.pdf  pdf/03-super-bayes.pdf  pdf/10-mpt-recognition-memory.pdf  pdf/11-mpt-with-jasp.pdf
 
@@ -8,9 +8,11 @@ pdf/%.pdf: src/%.Rmd
 	
 pdf/%.pdf: src/%.tex
 	pdflatex -jobname=$(basename $@) $< 
-	@egrep -q $(RERUNBIB) $*.log && bibtex $* && pdflatex $<; true
-	@egrep -q $(RERUN) $*.log && pdflatex $<; true
-	@egrep -q $(RERUN) $*.log && pdflatex $<; true
+	bibtex $(basename $@) 
+	bibtex $(basename $@) 
+	bibtex $(basename $@) 
+	pdflatex -jobname=$(basename $@) $< 
+	pdflatex -jobname=$(basename $@) $< 
 
 latexmk:
 	-latexmk -pvc -pdf $(DOC)
