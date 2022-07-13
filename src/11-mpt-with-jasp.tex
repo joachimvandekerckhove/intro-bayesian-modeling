@@ -82,6 +82,7 @@
 		\theta^\mathrm{f} &=& {\color<6->{darkgreen}\gamma} \nonumber
 	\end{eqnarray}
 
+    See \citeA{matzke2017bayesian} for more like this!
 \end{frame}
 
 
@@ -130,6 +131,7 @@
 		\end{tabular}
 	\end{minipage}\hspace{1cm}
 
+
 \end{frame}
 
 
@@ -163,33 +165,69 @@
 
 \begin{frame}[fragile]{One-High Threshold Model}
 
-	\begin{minipage}{0.45\textwidth}
+    \vspace{-1em}
+	\begin{minipage}{0.32\textwidth}
 		\begin{eqnarray*}
 			\rho &\sim& \operatorname{uniform}\left(0, 1\right) \\
 			\gamma &\sim&\operatorname{uniform}\left(0, 1\right) \\
 			\theta^\mathrm{h} &=& {\rho} + {\left(1-\rho\right)\gamma} \\
 			\theta^\mathrm{f} &=& {\gamma} \\
-			&&{\color{gray}\forall p \in (1,\ldots,P)}\\
-			k^\mathrm{h}_p &\sim& \operatorname{binomial}\left(\theta^\mathrm{h}, n_o\right) \\
-			k^\mathrm{f}_p &\sim& \operatorname{binomial}\left(\theta^\mathrm{f}, n_n\right)
+			k^\mathrm{h} &\sim& \operatorname{binomial}\left(\theta^\mathrm{h}, n_o\right) \\
+			k^\mathrm{f} &\sim& \operatorname{binomial}\left(\theta^\mathrm{f}, n_n\right)
 		\end{eqnarray*}
-	\end{minipage}\hfill
-	\begin{minipage}{0.45\textwidth}
-		\begin{verbatim}
-model{
-  rho   ~ dunif(0, 1)
-  gamma ~ dunif(0, 1)
-  thetaHit = rho + (1-rho)*gamma
-  thetaFA  = gamma
-  for (p in 1:nPeople){
-    hit[p] ~ dbin(thetaHit, nOld)
-    fa[p]  ~ dbin(thetaFA , nNew)
-  }
-}
-\end{verbatim}
-	\end{minipage}\hspace{1cm}
+		
+		There were 31 participants.  Each saw 15 old and 15 new stimuli.
+	\end{minipage}\hfill\small
+	\begin{minipage}{0.3\textwidth}
+		\begin{tabular}{crr}\hline
+			AS & Hits & FA   \\
+			\hline
+$+$ & 8 & 4\\
+$+$ & 9 & 4\\
+$+$ & 14 & 0\\
+$+$ & 14 & 1\\
+$+$ & 13 & 2\\
+$+$ & 8 & 0\\
+$+$ & 13 & 3\\
+$+$ & 12 & 1\\
+$+$ & 11 & 3\\
+$+$ & 4 & 0\\
+$+$ & 8 & 0\\
+$+$ & 13 & 1\\
+$+$ & 15 & 0\\
+$+$ & 12 & 0\\
+$+$ & 11 & 0\\
+$+$ & 9 & 0\\
+$+$ & 5 & 1\\
+\hline
+		\end{tabular}
+	\end{minipage}	\begin{minipage}{0.3\textwidth}
+		\begin{tabular}{crr}\hline
+			AS & Hits & FA   \\
+			\hline
+$+$ & 5 & 0\\
+$+$ & 6 & 3\\
+$+$ & 15 & 0\\
+$+$ & 11 & 0\\
+$+$ & 14 & 1\\
+$+$ & 12 & 2\\
+$+$ & 12 & 1\\
+$+$ & 11 & 2\\
+$+$ & 1 & 0\\
+$+$ & 14 & 0\\
+$+$ & 13 & 0\\
+$+$ & 7 & 2\\
+$+$ & 11 & 1\\
+$+$ & 12 & 2\\
+$+$ & 8 & 0\\
+$+$ & 11 & 2\\
+&&\\
+\hline
+		\end{tabular}
+	\end{minipage}
 
 \end{frame}
+
 
 
 
@@ -237,7 +275,10 @@ model{
 \end{frame}
 
 
-\bibliographystyle{apacite}
 
+\begin{frame}[allowframebreaks]{References}
+\bibliographystyle{apacite}
+\bibliography{./src/includes/cogs110B}
+\end{frame}
 
 \end{document}

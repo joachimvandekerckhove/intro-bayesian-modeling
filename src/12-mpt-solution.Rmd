@@ -1,0 +1,63 @@
+---
+title: "MPT solution"
+author: "Joachim Vandekerckhove"
+output:
+  beamer_presentation:
+    incremental: yes
+knit: (function(inputFile, encoding) {
+    rmarkdown::render(inputFile, encoding = encoding, output_dir = "../pdf")
+  })
+---
+
+
+## One-High Threshold Model ~ results
+
+```{r fig.width = 4.5, fig.height = 3.5, fig.align='center', message=FALSE, results = 'hide', echo=FALSE, jags}
+library(rjags)
+
+data <- list(
+  hits    = c( 8, 9,14,14,13, 8,13,12,11, 4, 8,13,15,12,11, 9, 5, 5, 6,15,11,14,12,12,11, 1,14,13, 7,11,12, 8,11),
+  fas     = c( 4, 4, 0, 1, 2, 0, 3, 1, 3, 0, 0, 1, 0, 0, 0, 0, 1, 0, 3, 0, 0, 1, 2, 1, 2, 0, 0, 0, 2, 1, 2, 0, 2),
+  nPeople = 31,
+  nOld    = 15, 
+  nNew    = 15)
+
+modelString = "
+  # MPT Recognition
+  # single high threshold
+  model{
+    for (i in 1:nPeople){
+      hits[i] ~ dbin(thetaHit, nOld)
+      fas[i]  ~ dbin(thetaFA , nNew)
+    }
+    thetaHit = rho + (1-rho)*gamma
+    thetaFA  = gamma
+    rho   ~ dunif(0, 1)
+    gamma ~ dunif(0, 1)
+  }
+"
+writeLines( modelString , con="mpt.txt") 
+parameters <- c("gamma",  "rho")
+jagsModel = jags.model( file="mpt.txt", data=data, n.chains=3, n.adapt=1000) 
+set.seed(0)
+update(jagsModel, n.iter=1000)
+samples = coda.samples(jagsModel, variable.names=parameters, n.iter=10000)
+
+plot(samples)
+```
+
+## One-High Threshold Model ~ summary statistics
+```{r, echo=TRUE, summary}
+
+summary(samples)$statistics
+
+summary(samples)$quantiles
+```
+
+## One-High Threshold Model ~ convergence
+```{r, echo=TRUE, convergence}
+
+effectiveSize(samples)
+
+gelman.diag(samples)
+```

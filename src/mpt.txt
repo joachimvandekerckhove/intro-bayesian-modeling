@@ -1,0 +1,14 @@
+
+  # MPT Recognition
+  # single high threshold
+  model{
+    for (i in 1:nPeople){
+      hits[i] ~ dbin(thetaHit, nOld)
+      fas[i]  ~ dbin(thetaFA , nNew)
+    }
+    thetaHit = rho + (1-rho)*gamma
+    thetaFA  = gamma
+    rho   ~ dunif(0, 1)
+    gamma ~ dunif(0, 1)
+  }
+
