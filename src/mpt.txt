@@ -1,6 +1,5 @@
 
-  # MPT Recognition
-  # single high threshold
+  # MPT single high threshold
   model{
     for (i in 1:nPeople){
       hits[i] ~ dbin(thetaHit, nOld)
