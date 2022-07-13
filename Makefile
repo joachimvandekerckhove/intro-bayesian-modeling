@@ -15,6 +15,9 @@ pdf/%.pdf: src/%.tex
 latexmk:
 	-latexmk -pvc -pdf $(DOC)
 
+push:
+	git add . && git commit -am"Automated commit" && git push
+  
 tidy:
 	-rm -f pdf/*.aux pdf/*.dvi pdf/*.log pdf/*.bbl pdf/*.blg pdf/*.brf pdf/*.fls pdf/*.toc pdf/*.thm pdf/*.out pdf/*.vrb pdf/*.snm pdf/*.nav pdf/*.fdb_latexmk
 

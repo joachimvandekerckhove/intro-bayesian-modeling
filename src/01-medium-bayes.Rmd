@@ -53,7 +53,6 @@ prior <- c(.8, 0.2 * prior.usc * k)  #     adds up to 1.0 (but keep in mind that
 
 # And make the bar plot:
 barplot(prior, main="tea", 
-        #xlab="parameter", ylab="density",
         names.arg=domain, ylim = c(0,1),
         border=rgb(.8,.9,0), col=rgb(.8,.9,0))
 ```
@@ -69,13 +68,23 @@ prior <- prior.usc * k                          #     adds up to 1.0
 
 # And make the bar plot:
 barplot(prior, main="wine", 
-        #xlab="parameter", ylab="density",
         names.arg=domain, ylim = c(0,1),
         border=rgb(.7,0,0), col=rgb(.7,0,0))
 ```
 
 ## The Lady Tasting Wine (RRRRRW)
-Shaping ones posterior: $p(\theta|x) = K p(\theta)p(x|\theta)$
+
+This was an exercise in _normalization_:
+
+- From a set of values that give us the _relative_ probabilities of possible values of $P_R$, find the _absolute_ probabilities by enforcing that all probabilities must add up to 1 (the possible values of $P_R$ form a disjoint set)
+- Often we can just deal with relative probabilities for convenience
+- Bayesians will routinely ignore these scaling values and only express equations using the "proportional to" symbol:
+$$P(H_0|X) \propto P(H_0)P(X|H_0)$$
+- $((A \propto B), (B \propto C)) \rightarrow (A \propto C)$
+- I usually make the proportionality explicit to avoid confusion
+
+## The Lady Tasting Wine (RRRRRW)
+Reshaping our posterior: $p(\theta|x) = K p(\theta)p(x|\theta)$\pause
 
 - Wine: $p(P_R | {\color{blue}\#R}, {\color{blue}\#W}, {\color{red}wine}) = S_w \times {\color{red}K_w (1.01 - P_R)(P_R - 0.49)} \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}}$
 - Tea: 
@@ -84,7 +93,7 @@ Shaping ones posterior: $p(\theta|x) = K p(\theta)p(x|\theta)$
 if $P_R > .05$
 
 ## The Lady Tasting Wine (RRRRRW)
-Excercise: plot these in R, using ${\color{blue}\#R=5}$, ${\color{blue}\#W=1}$
+Exercise: plot these in R, using ${\color{blue}\#R=5}$, ${\color{blue}\#W=1}$
 
 - Wine: $p(P_R | {\color{blue}\#R}, {\color{blue}\#W}, {\color{red}wine}) = S_w \times {\color{red}K_w (1.01 - P_R)(P_R - 0.49)} \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}}$
 - Tea: 
@@ -201,13 +210,13 @@ Updating the old posterior with new data:
 $$\begin{aligned}
 p(P_R &| {\color{blue}\#R}, {\color{blue}\#W}, {\color{gray}\#R_2}, {\color{gray}\#W_2}, {\color{red}wine}) = \\
 S_w & \times {\color{red}K_w (1.01 - P_R)(P_R - 0.49)} \\
-    & \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}} \times {\color{gray}C (1 - P_R)^{\#W_2} P_R^{\#R_2}}
+    & \times {\color{blue}C (1 - P_R)^{\#W} P_R^{\#R}} \times {\color{gray}C_2 (1 - P_R)^{\#W_2} P_R^{\#R_2}}
 \end{aligned}$$
 - ... which is equal to:
 $$\begin{aligned}
 p(P_R &| {\color{blue}\#R+\#R_2}, {\color{blue}\#W+\#W_2}, {\color{red}wine}) = \\
 S_w & \times {\color{red}K_w (1.01 - P_R)(P_R - 0.49)} \\
-    & \times {\color{blue}C (1 - P_R)^{\#W+\#W_2} P_R^{\#R+\#R_2}}
+    & \times {\color{blue}C' (1 - P_R)^{\#W+\#W_2} P_R^{\#R+\#R_2}}
 \end{aligned}$$
 
 

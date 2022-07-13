@@ -27,18 +27,19 @@ http://www.bayesmodels.com/
 - In another meaning---the classical, or frequentist meaning---probability is a statement of \emph{expected frequency over many repetitions}
 
 ## Prefacing notes: What is probability?
-- This distinction is directly relevant for empirical psychology.
+- This distinction is directly relevant for empirical psychology
 - In the overwhelming majority of cases, psychologists are interested in making probabilistic statements about singular events: an hypothesis is either true or not; an effect is either zero or not; the effect size is likely to be between X and Y; either the one model or the other is more likely given the data...
-- We are not usually interested in the frequency with which a well-defined process will achieve a certain outcome.
+- We are not usually interested in the frequency with which a well-defined process will achieve a certain outcome
 
 
 # The Sum and Product Rules of probability
 ## Some notational conventions:
 
 - $(A)$ is an _event_: a statement that can be true or false
-- $(A|B)$ is the _conditional_ event: that $A$ is true _assuming that $B$ is true_
+- $(A|B)$ is the _conditional_ event: $A$ is true _if $B$ is true_
+    + In other words, $B$ _implies_ $A$: $B \rightarrow A$
     + Independence means $P(A) = P(A|B)$
-- $(A,B)$ is the _joint_ event: that $A$ and $B$ are both true
+- $(A,B)$ is the _joint_ event: $A$ and $B$ are both true
     + Of course $P(A,B) = P(B,A)$
 - $(\neg A)$ is the negation of $A$: $A$ is false\pause
 
@@ -54,7 +55,7 @@ Of course,
 \begin{equation*}
 \begin{array}{rcl}
 P(A,B) &=& P(B)P(A|B)\\ 
-&=& P(A)P(B|A).
+= P(B,A) &=& P(A)P(B|A).
 \end{array}
 \end{equation*}
 
@@ -92,7 +93,7 @@ $$P(A) = \sum_{k=1}^K P(A,B_k).$$\pause
 That is, the probability of event $A$ alone is the sum of all the joint probabilities between $A$ and the elements of a disjunctive set.
 
 ## What is Bayesian inference?
-\textbf{Bayesian inference is the application of the product and sum rules of probability to real problems of inference.}\vspace{3ex}\pause
+\pause\textbf{Bayesian inference is the application of the product and sum rules of probability to real problems of inference.}\vspace{3ex}\pause
 
 "The sum and product rules\dots\ are a factory for building methods of inference" (-anon.)\vspace{3ex}\pause
 
@@ -149,23 +150,24 @@ Bayes' Rule is obtained as a necessary consequence of the Product Rule and the S
 
 # Why is Bayes better?
 ## The Lady Tasting Tea
-This story is set in the early 1900s, in a dining hall at Rothamsted Agricultural Experiment Station.
+\pause{}This story is set in the early 1900s, in a dining hall at Rothamsted Agricultural Experiment Station, and involves Ronald Aylmer Fisher, a leading eugenicist, and his colleague, algologist Dr. Muriel Bristol.\pause
 
-## The Lady Tasting Tea
-- Now famous statistician Ronald Aylmer Fisher enjoyed tea with his colleague, Dr. Muriel Bristol
-- Fisher put tea infusion into a cup and added milk
-- But Dr. Muriel protested, preferring her tea prepared the other way (first milk, then infusion)
+Fisher put tea infusion into a cup and added milk.\pause
 
-## The Lady Tasting Tea
-- Fisher, doubtful anyone could tell the difference, set up a blind discrimination experiment in which he prepared six pairs of cups
-- In the experiment, Dr. Bristol was able to make the correct discrimination five times, but erred on the sixth: RRRRRW
-- So, can she truly tell the difference or not? How do we decide?
+But Lady Muriel protested, preferring her tea prepared the other way (first milk, then infusion).\pause
+
+Fisher, doubtful anyone could tell the difference, set up a blind discrimination experiment in which he prepared six pairs of cups.\pause
+
+In the experiment, the Lady Muriel was able to make the correct discrimination five times, but erred on the sixth: RRRRRW\pause
+
+So, can she truly tell the difference or not? How do we decide?
 
 ## The Lady Tasting Tea (RRRRRW)
 - Fisher proceeded to develop what is now known as Fisher’s exact test in several steps
 - This was his first attempt:
     + Suppose the lady is completely unable to do what she claims -- she is effectively guessing. Let’s call this the null hypothesis, $H_0$
-    + Then try to discredit (_nullify_) $H_0$ by demonstrating that it makes the data very unlikely $(p < .05)$
+    + Then try to discredit (_nullify_) $H_0$ by demonstrating that _if $H_0$ **were** true, then the data would be very unlikely_:
+    + In other words, set out to show that $p=P(X|H_0)$ is small
 
 ## The Lady Tasting Tea (RRRRRW)
 - Fisher's first attempt...
@@ -210,7 +212,7 @@ This story is set in the early 1900s, in a dining hall at Rothamsted Agricultura
     + For the outcome RRRRRW, there are 5 others as extreme and 1, with no errors, more extreme, giving 7 cases in all and a total probability of $7 \times 2^{-6} = .109$, not significant at 5%
     
 ## The Lady Tasting Tea (RRRRRW)
-But what is the consequence of this absurd reliance on hypothetical data sets such as RRRRRR?
+But what is the consequence of this absurd reliance on hypothetical data sets such as RRRRRR?\pause
 
 - The frequentist is required to consider what results are as, or more, extreme
 - In this example, Fisher takes other possibilities with 6 pairs of cups

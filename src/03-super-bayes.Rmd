@@ -165,18 +165,22 @@ lines(domain, post.usc(domain)/K$value, lwd=3, col='red')
 - Basic unit of a Bayesian model is a distribution function
 - The posterior is defined through a \emph{generative model representation}
     - ... which is basically a sequence of distributional assumptions
+    - In Bayesian statistics, a "model" is just a special kind of distribution function over parameters and data (and so with possibly very many dimensions)
 
 ## Generative model representation
 Let's define a really trivial model ${\mathcal{M}}_t$ in which we estimate the parameters $\mu$ and $\tau$ ($=1/\sigma^2$) of a normal distribution, applied to some data points $d_j$:
-
 $${\mathcal{M}}_t: \begin{cases}
     {\color{red} \forall{j \in (1,\ldots,J)}: }{\;\;}d_j \sim N(\mu, \tau) \\ 
     \mu \sim N(0, 0.1)\\ 
     \tau \sim \Gamma(4, 0.01)\\ 
 \end{cases}$$\pause
-
-Notice how every statement is a distributional assumption! (Either priors on parameters or likelihoods on data.)
-
+Notice how every statement is a distributional assumption! (Either priors on parameters or likelihoods on data.)\pause
+\begin{eqnarray*}
+p(d_1,\ldots,d_J\mid{\mathcal{M}}_t) &=&
+    \left({\color{red} \prod_{j = 1}^{J}}N(d_j \mid \mu, \tau)\right) \\
+    &\times& N(\mu \mid 0, 0.1)\\
+    &\times& \Gamma(\tau \mid 4, 0.01)
+\end{eqnarray*}
 
 ## JAGS code is (almost) perfect
 $${\mathcal{M}}_s: \begin{cases}
@@ -214,10 +218,47 @@ $${\mathcal{M}}_{sdt}: \begin{cases}
         f ~ dbin(phif, noistrials)
      }
 
-## A psychological model: Signal detection theory
+## Signal detection theory ~ implementation
+
+     library(rjags)
+
+     data <- list( h = 32 ,  sigtrials  = 39 , 
+                   f = 12 ,  noistrials = 60 )
+
+     modelString = "
+         model {
+             d ~ dnorm(1, 1)             
+             b ~ dnorm(0, 1)
+        
+             phih <- phi( d / 2 - b)     
+             phif <- phi(-d / 2 - b)
+        
+             h ~ dbin(phih, sigtrials)  
+             f ~ dbin(phif, noistrials)
+          }
+     "
+
+## Signal detection theory ~ implementation
+
+     writeLines( modelString , con = "sdt.txt" ) 
+
+     jagsModel = jags.model( file     = "sdt.txt" , 
+                             data     =     data  , 
+                             n.chains =        3  , 
+                             n.adapt  =     1000  ) 
+
+     set.seed(0)
+     update( jagsModel , n.iter = 1000 )  # burn-in
+
+     samples = coda.samples( jagsModel ,
+                             variable.names = c("d", "b") ,
+                             n.iter         =      10000 )
+
+
+## Signal detection theory ~ results
+
 ```{r fig.width = 4.5, fig.height = 3.5, fig.align='center', message=FALSE, results = 'hide', echo=FALSE, jags}
 library(rjags)
-set.seed(0)
 
 data <- list(h = 32, sigtrials=39, f=12, noistrials=60)
 
@@ -236,8 +277,38 @@ modelString = "
 writeLines( modelString , con="sdt.txt") 
 parameters <- c("d",  "b")
 jagsModel = jags.model( file="sdt.txt", data=data, n.chains=3, n.adapt=1000) 
+set.seed(0)
 update(jagsModel, n.iter=1000)
 samples = coda.samples(jagsModel, variable.names=parameters, n.iter=10000)
 
 plot(samples)
 ```
+
+## Signal detection theory ~ summary statistics
+```{r, echo=TRUE, summary}
+
+summary(samples)$statistics
+
+summary(samples)$quantiles
+```
+
+## Signal detection theory ~ convergence
+```{r, echo=TRUE, convergence}
+
+effectiveSize(samples)
+
+gelman.diag(samples)
+```
+
+
+## Summary and conclusion
+
+The outcome of a Bayesian analysis is a probability distribution over parameters of interest\pause
+
+To communicate results, we needed a method to summarize arbitrary distributions\pause
+
+Monte Carlo methods provide such a method\pause
+
+JAGS (and Stan) have a straightforward modeling language that lets users specify a model\pause
+
+They then draw samples from the posterior distributions, so we can calculate any summaries we like
