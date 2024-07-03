@@ -68,7 +68,7 @@ The \textbf{Sum Rule of probability} requires one further concept: the \emph{dis
     + The possible outcomes of a roll of a six-sided die: {1, 2, 3, 4, 5, 6}
     + The truth of some hypothesis H, which must be either true or false: $\{H, \neg{H}\}$
 
-## The Sum Rule of Probability
+## The Sum Rule of probability
 - Suppose $B$ represents the event "It will rain tomorrow"
     + Then $\neg{B}$ represents the event "It will not rain tomorrow"
     + One and only one of these events can occur, so $\{B, \neg{B}\}$ forms a disjunctive set.
@@ -78,13 +78,13 @@ The \textbf{Sum Rule of probability} requires one further concept: the \emph{dis
 - Now there are four possible combinations of _joint events_: $(A,B)$, $(A,\neg{B})$, $(\neg{A},B)$, and $(\neg{A},\neg{B})$
     + These again form a disjunctive set
 
-## The Sum Rule of Probability
+## The Sum Rule of probability
 - With that in mind, we can formulate a simplified Sum Rule
 - The probability of a single one of these events alone, say $A$, can be found by adding up the probabilities of all of the joint events that contain $A$ as follows:
 $$P(A) = P(A,B) + P(A, \neg{B})$$
 - In words, the probability it rains today is the sum of two joint probabilities: (1) the probability it rains today and tomorrow, and (2) the probability it rains today but not tomorrow.
 
-## The Sum Rule of Probability
+## The Sum Rule of probability
 $$P(A) = P(A,B) + P(A, \neg{B})$$ is a simplification of the Sum Rule.\vspace{3ex}\pause
 
 In general, if $\{B_1, B_2, \ldots, B_K\}$ is a disjunctive set, the \textbf{Sum Rule of probability} states
@@ -192,18 +192,18 @@ So, can she truly tell the difference or not? How do we decide?
     + No longer "significant" at .05!
     
 ## The Lady Tasting Tea (RRRRRW)
-- Unfortunately, Fisher's second attempt has equally absurd implications
+- Fisher's second attempt has equally absurd implications
     + Consider a bigger tea-tasting study with 256 trials
     + The lady performs exactly at chance level, with 128R and 128W (the most likely pattern)
     + Each pattern has a probability of $2^{-256}$
-    + ... but there are $5.7 \times 10^75$ of these "128R, 128W" patterns
+    + ... but there are $5.7 \times 10^{75}$ of these "128R, 128W" patterns
     + $p = 5.7 \times 10^{75} \times 2^{-256} \approx .049$, and we again reject $H_0$ for _every possible outcome_
     
 ## The Lady Tasting Tea (RRRRRW)
 - Fisher's third attempt...
     + If 1 error in 6 is significant, surely so is no error, or 6 R's
     + We compute $p$ as the probability of observing data that is _at least as extreme_ as the real data, assuming that $H_0$ is true
-    + Absurdly, we now use as evidence an imaginary data pattern (RRRRRR) _that we did not observe and that no hypothesis we hold predicts_ (more on this in a moment)
+    + Somewhat absurdly, we now use as evidence an imaginary data pattern (RRRRRR) _that we did not observe and that no hypothesis we hold predicts_ (more on this in a moment)
 
 ## The Lady Tasting Tea (RRRRRW)
 - Fisher's third attempt is now the dominant statistical paradigm in psychology
@@ -220,10 +220,10 @@ But what is the consequence of this absurd reliance on hypothetical data sets su
 she have done fewer?
 
 ## The Lady Tasting Tea (RRRRRW)
-- What if the experiment was to keep going until she made a mistake?
+- What if the experiment had been to keep going until she made a mistake?
     + The probability of the sequence RRRRRW is still $2^{-6}$
     + More extreme sequences are now those in which the first mistake occurs after the $6^{th}$ pair, so at the $7^{th}$ (probability $2^{-7}$), or $8^{th}$ (probability $2^{-8}$), and so on
-    + The probability of the observed result _and more extreme ones_ is $\sum^{+\infty}_{i=6} 2^{-i} = .031$
+    + The probability of the observed result _and more extreme ones_ is $\sum^{+\infty}_{i=6} 2^{-i} = .031$ under the null
     + In the previous calculation, we had $p = .109$, yet now we have significance with $p$ < 5%
 - This is absurd! What does it matter what might have happened, but didn’t?
 
