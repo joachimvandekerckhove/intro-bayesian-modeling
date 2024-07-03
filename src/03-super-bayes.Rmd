@@ -16,7 +16,7 @@ knit: (function(inputFile, encoding) {
     - And also that seems lazy
 - We need a way to describe the posterior distribution
     - Mean? SD? Skew? Kurtosis? Mass at or around a certain value? $p(.8 \leq P_R \leq .9|\#R,\#W)$?
-    
+
 ## Posterior inference
 Determining these summary statistics analytically can be daunting and may in fact not be possible in general.\pause
 
@@ -39,7 +39,7 @@ domain <- seq(0.5, 1.0, .005)         # make the domain
 prior.usc <- dbeta(2*domain-1, 2, 2)  # this is the prior for all values
 
 # And make the bar plot:
-barplot(prior.usc, main="wine", 
+barplot(prior.usc, main="wine",
         #xlab="parameter", ylab="density",
         names.arg=domain,
         border=rgb(.7,0,0), col=rgb(.7,0,0))
@@ -97,7 +97,7 @@ curve(post.usc, 0.5, 1)
 - As it turns out, drawing random samples from a distribution is an efficient way to do that
     - Methods for doing this are called Monte Carlo methods
     - Math win: Monte Carlo methods don't need those hard-to-compute K and C scaling constants
-    
+
 ## Posterior sampling {.build}
 One Monte Carlo method is the rejection sampler:
 
@@ -170,9 +170,9 @@ lines(domain, post.usc(domain)/K$value, lwd=3, col='red')
 ## Generative model representation
 Let's define a really trivial model ${\mathcal{M}}_t$ in which we estimate the parameters $\mu$ and $\tau$ ($=1/\sigma^2$) of a normal distribution, applied to some data points $d_j$:
 $${\mathcal{M}}_t: \begin{cases}
-    {\color{red} \forall{j \in (1,\ldots,J)}: }{\;\;}d_j \sim N(\mu, \tau) \\ 
-    \mu \sim N(0, 0.1)\\ 
-    \tau \sim \Gamma(4, 0.01)\\ 
+    {\color{red} \forall{j \in (1,\ldots,J)}: }{\;\;}d_j \sim N(\mu, \tau) \\
+    \mu \sim N(0, 0.1)\\
+    \tau \sim \Gamma(4, 0.01)\\
 \end{cases}$$\pause
 Notice how every statement is a distributional assumption! (Either priors on parameters or likelihoods on data.)\pause
 \begin{eqnarray*}
@@ -184,10 +184,10 @@ p(d_1,\ldots,d_J\mid{\mathcal{M}}_t) &=&
 
 ## JAGS code is (almost) perfect
 $${\mathcal{M}}_s: \begin{cases}
-    \forall{j \in (1,\ldots,J)}: d_j \sim N(\mu, \tau) \\ 
-    \mu \sim N(0, 0.1)\\ 
+    \forall{j \in (1,\ldots,J)}: d_j \sim N(\mu, \tau) \\
+    \mu \sim N(0, 0.1)\\
     \tau \sim \Gamma(4, 0.01)\\
-\end{cases}$$ 
+\end{cases}$$
 
 \bigskip
 The program needs to know the specifics of the model:
@@ -199,7 +199,7 @@ The program needs to know the specifics of the model:
         mu ~ dnorm(0,0.1)
         tau ~ dgamma(4,0.01)
     }
-    
+
 ## A psychological model: Signal detection theory
 $${\mathcal{M}}_{sdt}: \begin{cases}
     \delta \sim N(1, 1)            & \beta \sim N(0, 1)\\
@@ -208,13 +208,13 @@ $${\mathcal{M}}_{sdt}: \begin{cases}
 \end{cases}$$ \pause
 
     model {
-        d ~ dnorm(1, 1)             
+        d ~ dnorm(1, 1)
         b ~ dnorm(0, 1)
-        
-        phih <- phi( d / 2 - b)     
+
+        phih <- phi( d / 2 - b)
         phif <- phi(-d / 2 - b)
-        
-        h ~ dbin(phih, sigtrials)  
+
+        h ~ dbin(phih, sigtrials)
         f ~ dbin(phif, noistrials)
      }
 
@@ -222,30 +222,30 @@ $${\mathcal{M}}_{sdt}: \begin{cases}
 
      library(rjags)
 
-     data <- list( h = 32 ,  sigtrials  = 39 , 
+     data <- list( h = 32 ,  sigtrials  = 39 ,
                    f = 12 ,  noistrials = 60 )
 
      modelString = "
          model {
-             d ~ dnorm(1, 1)             
+             d ~ dnorm(1, 1)
              b ~ dnorm(0, 1)
-        
-             phih <- phi( d / 2 - b)     
+
+             phih <- phi( d / 2 - b)
              phif <- phi(-d / 2 - b)
-        
-             h ~ dbin(phih, sigtrials)  
+
+             h ~ dbin(phih, sigtrials)
              f ~ dbin(phif, noistrials)
           }
      "
 
 ## Signal detection theory ~ implementation
 
-     writeLines( modelString , con = "sdt.txt" ) 
+     writeLines( modelString , con = "sdt.txt" )
 
-     jagsModel = jags.model( file     = "sdt.txt" , 
-                             data     =     data  , 
-                             n.chains =        3  , 
-                             n.adapt  =     1000  ) 
+     jagsModel = jags.model( file     = "sdt.txt" ,
+                             data     =     data  ,
+                             n.chains =        3  ,
+                             n.adapt  =     1000  )
 
      set.seed(0)
      update( jagsModel , n.iter = 1000 )  # burn-in
@@ -264,19 +264,19 @@ data <- list(h = 32, sigtrials=39, f=12, noistrials=60)
 
 modelString = "
     model {
-        d ~ dnorm(1, 1)             
+        d ~ dnorm(1, 1)
         b ~ dnorm(0, 1)
-        
-        phih <- phi( d / 2 - b)     
+
+        phih <- phi( d / 2 - b)
         phif <- phi(-d / 2 - b)
-        
-        h ~ dbin(phih, sigtrials)  
+
+        h ~ dbin(phih, sigtrials)
         f ~ dbin(phif, noistrials)
      }
 "
-writeLines( modelString , con="sdt.txt") 
+writeLines( modelString , con="sdt.txt")
 parameters <- c("d",  "b")
-jagsModel = jags.model( file="sdt.txt", data=data, n.chains=3, n.adapt=1000) 
+jagsModel = jags.model( file="sdt.txt", data=data, n.chains=3, n.adapt=1000)
 set.seed(0)
 update(jagsModel, n.iter=1000)
 samples = coda.samples(jagsModel, variable.names=parameters, n.iter=10000)
